@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Bilan Commercial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2252%22 font-size=%2250%22>🏪</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <a href="../index.html" class="home-button">
+        <span class="home-text">🏠 Accueil</span>
+        <span class="home-icon">🏠</span>
+    </a>
+
+    <div class="container">
+        <h1>🏪 Générateur de Bilan Commercial 🏪</h1>
+
+        <!-- Étape 1 : Saisie des informations commerciales -->
+        <div class="commerce-card" id="step1">
+            <div class="commerce-grid">
+                
+                <!-- Section Village 1 -->
+                <div class="commerce-section village1-section">
+                    <h2 class="section-title">Village 1 🏘️</h2>
+                    <div class="village-box">
+                        <div class="form-group">
+                            <label for="village1-nom">Nom du Village <span style="color: #d32f2f;">*</span> :</label>
+                            <input type="text" id="village1-nom" placeholder="Nom du village">
+                        </div>
+
+                        <h3 class="subsection-title">Ce que donne le Village 1</h3>
+                        
+                        <div class="resources-simple">
+                            <div class="form-group">
+                                <label for="village1-donne-materiaux">Matériaux 🏗️ :</label>
+                                <input type="number" id="village1-donne-materiaux" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="village1-donne-potions">Potions 🧪 :</label>
+                                <input type="number" id="village1-donne-potions" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="village1-donne-argent">Argent 🪙 :</label>
+                                <input type="number" id="village1-donne-argent" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Village 2 -->
+                <div class="commerce-section village2-section">
+                    <h2 class="section-title">Village 2 🏘️</h2>
+                    <div class="village-box">
+                        <div class="form-group">
+                            <label for="village2-nom">Nom du Village <span style="color: #d32f2f;">*</span> :</label>
+                            <input type="text" id="village2-nom" placeholder="Nom du village">
+                        </div>
+
+                        <h3 class="subsection-title">Ce que donne le Village 2</h3>
+                        
+                        <div class="resources-simple">
+                            <div class="form-group">
+                                <label for="village2-donne-materiaux">Matériaux 🏗️ :</label>
+                                <input type="number" id="village2-donne-materiaux" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="village2-donne-potions">Potions 🧪 :</label>
+                                <input type="number" id="village2-donne-potions" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="village2-donne-argent">Argent 🪙 :</label>
+                                <input type="number" id="village2-donne-argent" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="button-container">
+                <button class="calculate-btn" onclick="validerTransaction()">✅ Valider la Transaction</button>
+                <button class="reset-btn" onclick="reinitialiser()">🔄 Réinitialiser</button>
+            </div>
+        </div>
+
+        <!-- Étape 2 : Résultats -->
+        <div class="results-card" id="results" style="display: none;">
+            <h2>📋 Bilan de la Transaction Commerciale</h2>
+            <div id="results-content"></div>
+            <h3 class="result-title">Présenter ce bilan au Maître de Salle</h3>
+            <div class="button-container">
+                <button class="calculate-btn" onclick="ouvrirBilanMaitre()">📋 Bilan Maître de Salle</button>
+                <button class="reset-btn" onclick="nouvelleTransaction()">🏪 Nouvelle Transaction</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton d'aide en bas à droite -->
+    <button id="help-btn" aria-label="Afficher les règles">❓</button>
+
+    <!-- Modale des règles -->
+    <div class="modal-overlay" id="rules-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" id="close-rules-modal" aria-label="Fermer">✕</button>
+            <h2>📜 Règles du Commerce</h2>
+            <div class="modal-scroll">
+                <h3>🏪 Transaction Commerciale</h3>
+                <p>Les villages peuvent échanger 3 types de ressources :</p>
+                <ul>
+                    <li><strong>Matériaux 🏗️ :</strong> Bois, Pierre, Fer, Nourriture...</li>
+                    <li><strong>Potions 🧪 :</strong> Toutes les potions magiques</li>
+                    <li><strong>Argent 🪙 :</strong> Pièces d'or</li>
+                </ul>
+
+                <h3>⚖️ Fonctionnement Simple</h3>
+                <p>Chaque village indique simplement ce qu'il donne :</p>
+                <ul>
+                    <li>Village 1 donne ses ressources</li>
+                    <li>Village 2 donne ses ressources</li>
+                    <li>Le bilan affiche automatiquement les gains/pertes pour chaque village</li>
+                </ul>
+
+                <h3>📋 Bilan Final</h3>
+                <p>Le bilan récapitule :</p>
+                <ul>
+                    <li>Les ressources échangées entre les villages</li>
+                    <li>Le détail des gains/pertes pour chaque village</li>
+                    <li>La validation de l'équilibre de la transaction</li>
+                </ul>
+
+                <h3>🎯 Validation</h3>
+                <p>Le Maître de Salle vérifie que :</p>
+                <ul>
+                    <li>Les villages possèdent bien les ressources à donner</li>
+                    <li>L'échange est équitable et accepté par les deux parties</li>
+                    <li>Aucune erreur dans les quantités</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale du bilan maître -->
+    <div class="modal-overlay bilan-modal" id="bilan-modal" style="display: none;">
+        <div class="modal-content bilan-modal-content">
+            <button class="modal-close" id="close-bilan-modal" aria-label="Fermer">✕</button>
+            <h2>📋 Bilan pour le Maître de Salle</h2>
+            <div class="modal-scroll" id="bilan-maitre-contenu">
+                <!-- Contenu généré dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -62,7 +62,7 @@
         /* Grille des options */
         .options-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
         }
 
@@ -98,6 +98,10 @@
 
         .option-card.notion .option-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .option-card.commerce .option-header {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
         }
 
         .option-icon {
@@ -155,6 +159,10 @@
 
         .option-card.notion .option-features li::before {
             content: "📚";
+        }
+
+        .option-card.commerce .option-features li::before {
+            content: "🏪";
         }
 
         .option-button {
@@ -309,12 +317,12 @@
             }
         }
 
-        /* Desktop (1025px et plus) - 3 colonnes */
+        /* Desktop (1025px et plus) - 4 colonnes */
         @media (min-width: 1025px) {
             .options-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(4, 1fr);
                 gap: 1.5rem;
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: 0 auto;
             }
         }
@@ -323,7 +331,7 @@
         @media (min-width: 1400px) {
             .options-grid {
                 gap: 2rem;
-                max-width: 1400px;
+                max-width: 1600px;
             }
             
             .option-content {
@@ -364,6 +372,12 @@
 
         .option-card:nth-child(3) {
             animation-delay: 0.6s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        .option-card:nth-child(4) {
+            animation-delay: 0.8s;
             opacity: 0;
             animation-fill-mode: forwards;
         }
@@ -430,6 +444,20 @@
                 <div class="option-content">
                     <div class="option-button">
                         Aller au Calculateur
+                    </div>
+                </div>
+            </a>
+
+            <!-- Générateur de bilan commercial -->
+            <a href="commerce/index.html" class="option-card commerce">
+                <div class="option-header">
+                    <span class="option-icon">🏪</span>
+                    <h2 class="option-title">Bilan Commercial</h2>
+                    <p class="option-subtitle">Gérez vos transactions entre villages</p>
+                </div>
+                <div class="option-content">
+                    <div class="option-button">
+                        Générer un Bilan
                     </div>
                 </div>
             </a>

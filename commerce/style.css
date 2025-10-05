@@ -1,0 +1,570 @@
+/* ===========================
+   RESET & BASE (identique au calculateur de combat)
+   =========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #bfa76a 0%, #724d19 100%);
+    min-height: 100vh;
+    padding: 30px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ===========================
+   TITRES & TYPOGRAPHIE
+   =========================== */
+h1 {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', 'Times New Roman', serif;
+}
+
+h2 {
+    color: #3e2c13;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', 'Times New Roman', serif;
+}
+
+h3 {
+    color: #5a3f1a;
+    margin: 20px 0 15px 0;
+    font-size: 1.3em;
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', 'Times New Roman', serif;
+}
+
+/* ===========================
+   CARTES PRINCIPALES
+   =========================== */
+.commerce-card, .results-card {
+    background: #fffbe6;
+    border-radius: 20px;
+    border: 3px solid #bfa76a;
+    box-shadow: 0 8px 32px rgba(139, 111, 71, 0.18);
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+/* ===========================
+   GRILLE COMMERCE
+   =========================== */
+.commerce-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.commerce-section {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 30px;
+    border: 2px solid #d4c4a0;
+}
+
+.village-box {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid #e8d8b5;
+}
+
+.section-title {
+    text-align: center;
+    color: #3e2c13;
+    margin-bottom: 25px;
+    font-size: 1.6em;
+    border-bottom: 2px solid #bfa76a;
+    padding-bottom: 10px;
+}
+
+.subsection-title {
+    color: #5a3f1a;
+    margin: 25px 0 15px 0;
+    font-size: 1.2em;
+    border-left: 4px solid #bfa76a;
+    padding-left: 12px;
+    background: rgba(191, 167, 106, 0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+/* ===========================
+   GRILLES DE RESSOURCES
+   =========================== */
+.resources-simple {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* ===========================
+   FORMULAIRES
+   =========================== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    color: #5a3f1a;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+input[type="text"],
+input[type="number"] {
+    padding: 12px 16px;
+    border: 2px solid #d4c4a0;
+    border-radius: 8px;
+    font-size: 1em;
+    background: #ffffff;
+    color: #3e2c13;
+    font-family: 'Roboto', sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: #bfa76a;
+    box-shadow: 0 0 0 3px rgba(191, 167, 106, 0.2);
+}
+
+input[type="number"] {
+    text-align: center;
+    font-weight: 600;
+    width: 100%;
+}
+
+input[type="text"] {
+    font-weight: 500;
+}
+
+/* ===========================
+   BOUTONS (identique au calculateur de combat)
+   =========================== */
+.button-container {
+    padding: 30px;
+    text-align: center;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.calculate-btn,
+.next-btn,
+.reset-btn {
+    background: linear-gradient(135deg, #bfa76a 0%, #8b6f47 100%);
+    color: #ffffff;
+    border: 2px solid #a68b4a;
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', 'Times New Roman', serif;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.12);
+    padding: 16px 60px;
+    font-size: 1.2em;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.calculate-btn:hover,
+.next-btn:hover,
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.calculate-btn:active,
+.next-btn:active,
+.reset-btn:active {
+    transform: translateY(0);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #fc6c85 0%, #d73a49 100%);
+}
+
+/* ===========================
+   RÉSULTATS
+   =========================== */
+.results-card {
+    background: #f0f8e8;
+    border: 3px solid #7cb342;
+}
+
+.result-title {
+    text-align: center;
+    color: #388e3c;
+    margin: 20px 0;
+    font-size: 1.4em;
+}
+
+#results-content {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px 0;
+    border: 2px solid #a5d6a7;
+}
+
+/* ===========================
+   TABLEAUX
+   =========================== */
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-table th,
+.transaction-table td {
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.transaction-table th {
+    background: linear-gradient(135deg, #bfa76a 0%, #8b6f47 100%);
+    color: #ffffff;
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.transaction-table td {
+    color: #3e2c13;
+    font-weight: 500;
+}
+
+.transaction-table tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.transaction-table tr:hover {
+    background: #f0f8e8;
+}
+
+/* ===========================
+   MESSAGES D'ERREUR
+   =========================== */
+.error-message {
+    background: #ff6b6b;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.success-message {
+    background: #4ecdc4;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+}
+
+/* ===========================
+   BOUTON ACCUEIL (identique au calculateur de combat)
+   =========================== */
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #bfa76a 0%, #8b6f47 100%);
+    color: #3e2c13;
+    text-decoration: none;
+    border: 2px solid #a68b4a;
+    border-radius: 12px;
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', serif;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.18);
+    font-weight: 500;
+    padding: 12px 24px;
+    font-size: 1.1em;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.home-button:hover {
+    background: linear-gradient(135deg, #d2b48c 0%, #bfa76a 100%);
+    box-shadow: 0 4px 16px rgba(139, 111, 71, 0.25);
+    transform: translateY(-2px);
+}
+
+.home-text {
+    display: inline;
+}
+
+.home-icon {
+    display: none;
+}
+
+/* ===========================
+   BOUTON D'AIDE (identique au calculateur de combat)
+   =========================== */
+#help-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1001;
+    background: linear-gradient(135deg, #bfa76a 0%, #8b6f47 100%);
+    color: #3e2c13;
+    border: 2px solid #a68b4a;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    font-size: 2em;
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', serif;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.18);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#help-btn:hover {
+    background: linear-gradient(135deg, #d2b48c 0%, #bfa76a 100%);
+    box-shadow: 0 4px 16px rgba(139, 111, 71, 0.25);
+}
+
+/* ===========================
+   MODALES (identique au calculateur de combat)
+   =========================== */
+.modal-overlay {
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    background: rgba(60, 50, 30, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: #fffbe6;
+    border-radius: 18px;
+    border: 3px solid #bfa76a;
+    box-shadow: 0 8px 32px rgba(139, 111, 71, 0.18);
+    max-width: 95vw;
+    width: 820px;
+    max-height: 90vh;
+    padding: 32px 24px 24px 24px;
+    position: relative;
+    font-family: 'Roboto', Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-scroll {
+    overflow-y: auto;
+    max-height: 65vh;
+    padding-right: 4px;
+}
+
+.modal-content h2 {
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', serif;
+    font-size: 1.5em;
+    margin-bottom: 18px;
+    color: #3e2c13;
+    text-align: center;
+    border-bottom: 2px solid #bfa76a;
+    padding-bottom: 12px;
+}
+
+.modal-content h3 {
+    font-family: 'IM Fell DW Pica', 'Roboto Slab', serif;
+    color: #5a3f1a;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.modal-content p, .modal-content li {
+    color: #3e2c13;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.modal-content ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: #8b6f47;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(139, 111, 71, 0.1);
+    color: #5a3f1a;
+}
+
+/* Modale spéciale pour le bilan maître */
+.bilan-modal-content {
+    max-width: 90vw;
+    width: 1000px;
+}
+
+/* Version mobile */
+@media (max-width: 768px) {
+    .home-button {
+        bottom: 20px;
+        left: 20px;
+        top: auto;
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        font-size: 1.5em;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+    
+    .home-text {
+        display: none;
+    }
+    
+    .home-icon {
+        display: block;
+    }
+    
+    /* Commerce grid en colonne sur mobile */
+    .commerce-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    /* Grilles de ressources déjà en colonne */
+    .resources-simple {
+        gap: 12px;
+    }
+    
+    /* Commerce section plus compact */
+    .commerce-section {
+        padding: 20px;
+    }
+    
+    .village-box {
+        padding: 20px;
+    }
+    
+    /* Inputs numériques centrés et petits */
+    input[type="number"] {
+        width: 80px;
+        text-align: center;
+        font-weight: 600;
+        margin: 0 auto;
+    }
+    
+    /* Inputs texte gardent leur largeur */
+    input[type="text"] {
+        width: 100%;
+    }
+    
+    /* Labels étendus sur toute la largeur */
+    .form-group {
+        width: 100%;
+    }
+    
+    .form-group label {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Boutons responsifs sur mobile */
+    .button-container {
+        padding: 20px 15px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .calculate-btn,
+    .reset-btn {
+        width: 100%;
+        max-width: 280px;
+        padding: 14px 20px;
+        font-size: 1.1em;
+    }
+    
+    /* Tableaux responsive */
+    .transaction-table {
+        font-size: 0.9em;
+    }
+    
+    .transaction-table th,
+    .transaction-table td {
+        padding: 8px 12px;
+    }
+}
+
+@media (min-width: 769px) {
+    .home-text {
+        display: inline;
+    }
+    
+    .home-icon {
+        display: none;
+    }
+}
