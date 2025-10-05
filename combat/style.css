@@ -195,77 +195,30 @@ input:disabled,
     margin-bottom: 0;
 }
 
-/* Oppidum label au-dessus du switch, centré */
+/* Oppidum group - maintenant utilisé pour la checkbox */
 .oppidum-group {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-}
-
-.oppidum-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 0.95em;
-    color: #fff;
-    min-height: 1.5em;
-    margin-right: 0;
-    height: auto;
+    justify-content: center;
 }
 
 /* ===========================
-   SWITCH (OPPIDUM)
+   CHECKBOX OPPIDUM SIMPLE
    =========================== */
-.switch-container {
-    height: 42px;
+.oppidum-group label {
     display: flex;
     align-items: center;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 52px;
-    height: 28px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
+    gap: 8px;
+    color: #fff;
+    font-weight: 500;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #ccc;
-    transition: .4s;
-    border-radius: 34px;
 }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 3px;
-    bottom: 3px;
-    background: white;
-    transition: .4s;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-input:checked+.slider {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-input:checked+.slider:before {
-    transform: translateX(24px);
+.oppidum-group input[type="checkbox"] {
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    margin-left: 8px;
 }
 
 /* ===========================
@@ -560,11 +513,110 @@ footer a:focus img {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .home-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Version mobile : bouton rond en bas à gauche */
+@media (max-width: 768px) {
+    .home-button {
+        bottom: 20px;
+        left: 20px;
+        top: auto;
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        font-size: 1.5em;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+    
+    .home-text {
+        display: none;
+    }
+    
+    .home-icon {
+        display: block;
+    }
+    
+    /* Tous les conteneurs prennent toute la largeur sur mobile */
+    .action-desirees-grid,
+    .village-grid,
+    .g2-oppidum-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .action-desirees-group {
+        grid-column: span 1;
+    }
+    
+    /* Ligne G1-M1 passe en colonne sur mobile */
+    .g1-m1-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    /* Tous les inputs numériques sont petits et centrés */
+    input[type="number"] {
+        width: 70px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    /* Les inputs texte restent en largeur normale */
+    input[type="text"] {
+        width: 100%;
+    }
+    
+    /* Le select Action désirée garde sa largeur normale */
+    #action-desiree {
+        width: 100%;
+    }
+    
+    /* Labels étendus sur toute la largeur */
+    .form-group {
+        width: 100%;
+    }
+    
+    .form-group label {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Oppidum simple sur mobile */
+    .oppidum-group {
+        width: 100%;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        margin: 8px 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .oppidum-group label {
+        font-size: 1.1rem;
+        align-items: center;
+        display: flex;
+    }
+}
+
+@media (min-width: 769px) {
+    .home-text {
+        display: inline;
+    }
+    
+    .home-icon {
+        display: none;
+    }
 }
 
 /* ===========================

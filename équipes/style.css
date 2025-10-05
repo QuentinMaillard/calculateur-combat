@@ -474,11 +474,48 @@ body {
     letter-spacing: 0.5px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .back-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Version mobile : bouton rond en bas à gauche */
+@media (max-width: 768px) {
+    .back-button {
+        bottom: 20px;
+        left: 20px;
+        top: auto;
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        font-size: 1.5em;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+    
+    .back-text {
+        display: none;
+    }
+    
+    .back-icon {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .back-text {
+        display: inline;
+    }
+    
+    .back-icon {
+        display: none;
+    }
 }
 
 /* Footer & Logo */
