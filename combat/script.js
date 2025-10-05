@@ -875,3 +875,249 @@ step1Inputs.forEach(id => {
         });
     }
 });
+
+// ===========================
+// MODALE BILAN MAITRE DE SALLE
+// ===========================
+
+function ouvrirBilanMaitre() {
+    const bilanModal = document.getElementById('bilan-maitre-modal');
+    const bilanTableau = document.getElementById('bilan-tableau');
+    
+    // Générer le tableau de bilan
+    bilanTableau.innerHTML = genererBilanTableau();
+    
+    // Afficher la modale
+    bilanModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    bilanModal.focus();
+}
+
+function genererBilanTableau() {
+    const {
+        attaquantNom,
+        attaquantGuerriers,
+        attaquantPotions,
+        defenseur1Nom,
+        defenseur1Guerriers,
+        defenseur2Nom,
+        defenseur2Guerriers,
+        ressourcesDesirees,
+        oppidumActif
+    } = gameData;
+
+    // Calculer les pertes et gains (reprendre la logique de calculerCombat)
+    const aAllie = defenseur2Guerriers > 0;
+    
+    // Recalculer le combat pour obtenir les résultats
+    let defenseur1GuerriersEff = defenseur1Guerriers;
+    let defenseur2GuerriersEff = defenseur2Guerriers;
+    let bonusOppidum = 0;
+    if (oppidumActif) {
+        bonusOppidum = Math.floor((defenseur1Guerriers + defenseur2Guerriers) / 2);
+        defenseur1GuerriersEff = defenseur1Guerriers;
+        defenseur2GuerriersEff = defenseur2Guerriers;
+    }
+
+    const A = attaquantGuerriers + attaquantDe + (attaquantPotions * 0.5);
+    const D = defenseur1GuerriersEff + defenseur2GuerriersEff + bonusOppidum + defenseurDe;
+    const R = A - D;
+
+    // Calcul des ressources volées
+    let ressourcesVolees = 0;
+    if (R > 0) {
+        let V = Math.ceil(R / 2);
+        if (ressourcesDesirees === 'potion') {
+            V = Math.ceil(V / 2);
+        }
+        const ressourcesDisponibles = ressourcesDesirees === 'potion' ? 
+            gameData.potionsDisponibles : gameData.materiauxDisponibles;
+        ressourcesVolees = Math.min(V, ressourcesDisponibles);
+    }
+
+    // Calculer les pertes de guerriers (utiliser la même logique exacte)
+    function calculerPertesAvanceesIdentique(guerriers, de, guerriersAdverse, deAdverse, victoire) {
+        if (guerriers === 0) return { pertes: 0, pourcentage: 0 };
+
+        // Rapport de force
+        let rapport = guerriersAdverse === 0 ? 2 : guerriers / guerriersAdverse;
+        // Bonus/malus de dé
+        let bonusDe = de - deAdverse;
+
+        let base;
+        if (victoire) {
+            if (rapport > 1.5) base = 2;
+            else if (rapport < 0.7) base = 10;
+            else base = 5;
+            // Ajustement selon le jet de dé
+            if (bonusDe >= 4) base = Math.max(1, base - 2);
+            if (bonusDe <= -4) base = Math.min(15, base + 3);
+        } else {
+            if (rapport < 0.7) base = 35;
+            else if (rapport > 1.5) base = 15;
+            else base = 25;
+            // Ajustement selon le jet de dé
+            if (bonusDe <= -4) base = Math.min(50, base + 10);
+            if (bonusDe >= 4) base = Math.max(5, base - 5);
+        }
+
+        // Clamp pour éviter l'abus
+        base = Math.max(1, Math.min(base, 50));
+
+        return {
+            pertes: Math.ceil(guerriers * (base / 100)),
+            pourcentage: base
+        };
+    }
+
+    const pertesAttaquantBrut = calculerPertesAvanceesIdentique(
+        attaquantGuerriers, attaquantDe,
+        defenseur1GuerriersEff + defenseur2GuerriersEff, defenseurDe,
+        R > 0
+    );
+    
+    const pertesDefenseur1Brut = calculerPertesAvanceesIdentique(
+        defenseur1Guerriers, defenseurDe,
+        attaquantGuerriers, attaquantDe,
+        R <= 0
+    );
+    
+    const pertesDefenseur2Brut = aAllie ? calculerPertesAvanceesIdentique(
+        defenseur2Guerriers, defenseurDe,
+        attaquantGuerriers, attaquantDe,
+        R <= 0
+    ) : { pertes: 0, pourcentage: 0 };
+
+    const pertesAttaquant = Math.max(0, pertesAttaquantBrut.pertes - attaquantPotions);
+    
+    function oppidumSauve(pertes, oppidumActif) {
+        if (!oppidumActif) return pertes;
+        let sauves = 0;
+        for (let i = 0; i < pertes; i++) {
+            if (Math.random() < 0.5) sauves++;
+        }
+        return pertes - sauves;
+    }
+    
+    const pertesDefenseur1 = oppidumSauve(pertesDefenseur1Brut.pertes, oppidumActif);
+    const pertesDefenseur2 = oppidumSauve(pertesDefenseur2Brut.pertes, oppidumActif);
+
+    // Construire le tableau
+    let html = `
+        <div class="bilan-tableau">
+            <div class="bilan-header">
+                Bilan des ressources par village
+            </div>
+            <div class="bilan-row header">
+                <div>Village</div>
+                <div>Statut</div>
+                <div>Matériaux</div>
+                <div>Guerriers</div>
+                <div>Potions</div>
+            </div>
+    `;
+
+    // Village attaquant
+    const statutAttaquant = R > 0 ? 'Gagnant' : 'Perdant';
+    const classStatutAttaquant = R > 0 ? 'statut-gagnant' : 'statut-perdant';
+    
+    let potionsAttaquant = -attaquantPotions; // Consommées
+    let materiauxAttaquant = 0;
+    
+    if (R > 0 && ressourcesDesirees === 'potion') {
+        potionsAttaquant += ressourcesVolees;
+    } else if (R > 0 && ressourcesDesirees === 'materiaux') {
+        materiauxAttaquant += ressourcesVolees;
+    }
+
+    html += `
+        <div class="bilan-row">
+            <div class="bilan-village">${attaquantNom}</div>
+            <div class="bilan-statut ${classStatutAttaquant}">${statutAttaquant}</div>
+            <div class="bilan-materiaux ${materiauxAttaquant > 0 ? 'gain' : materiauxAttaquant < 0 ? 'perte' : 'neutre'}">
+            ${materiauxAttaquant > 0 ? '+' : ''}${materiauxAttaquant}
+            </div>
+            <div class="bilan-guerriers ${pertesAttaquant > 0 ? 'perte' : 'neutre'}">
+            ${pertesAttaquant > 0 ? '-' : ''}${pertesAttaquant}
+            </div>
+            <div class="bilan-potions ${potionsAttaquant > 0 ? 'gain' : potionsAttaquant < 0 ? 'perte' : 'neutre'}">
+                ${potionsAttaquant > 0 ? '+' : ''}${potionsAttaquant}
+            </div>
+        </div>
+    `;
+
+    // Village défenseur principal
+    const statutDefenseur1 = R <= 0 ? 'Gagnant' : 'Perdant';
+    const classStatutDefenseur1 = R <= 0 ? 'statut-gagnant' : 'statut-perdant';
+    
+    let potionsDefenseur1 = 0;
+    let materiauxDefenseur1 = 0;
+    
+    if (R > 0 && ressourcesDesirees === 'potion') {
+        potionsDefenseur1 = -ressourcesVolees;
+    } else if (R > 0 && ressourcesDesirees === 'materiaux') {
+        materiauxDefenseur1 = -ressourcesVolees;
+    }
+
+    html += `
+        <div class="bilan-row">
+            <div class="bilan-village">${defenseur1Nom}</div>
+            <div class="bilan-statut ${classStatutDefenseur1}">${statutDefenseur1}</div>
+            <div class="bilan-materiaux ${materiauxDefenseur1 > 0 ? 'gain' : materiauxDefenseur1 < 0 ? 'perte' : 'neutre'}">
+            ${materiauxDefenseur1 > 0 ? '+' : ''}${materiauxDefenseur1}
+            </div>
+            <div class="bilan-guerriers ${pertesDefenseur1 > 0 ? 'perte' : 'neutre'}">
+            ${pertesDefenseur1 > 0 ? '-' : ''}${pertesDefenseur1}
+            </div>
+            <div class="bilan-potions ${potionsDefenseur1 > 0 ? 'gain' : potionsDefenseur1 < 0 ? 'perte' : 'neutre'}">
+                ${potionsDefenseur1 > 0 ? '+' : ''}${potionsDefenseur1}
+            </div>
+        </div>
+    `;
+
+    // Village allié s'il existe
+    if (aAllie) {
+        html += `
+            <div class="bilan-row">
+                <div class="bilan-village">${defenseur2Nom}</div>
+                <div class="bilan-statut statut-soutien">Soutien</div>
+                <div class="bilan-materiaux neutre">0</div>
+                <div class="bilan-guerriers ${pertesDefenseur2 > 0 ? 'perte' : 'neutre'}">
+                ${pertesDefenseur2 > 0 ? '-' : ''}${pertesDefenseur2}
+                </div>
+                <div class="bilan-potions neutre">0</div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    
+    return html;
+}
+
+// Gestion de la fermeture de la modale bilan
+const bilanModal = document.getElementById('bilan-maitre-modal');
+const closeBilanModal = document.getElementById('close-bilan-modal');
+
+if (closeBilanModal) {
+    closeBilanModal.addEventListener('click', () => {
+        bilanModal.style.display = 'none';
+        document.body.style.overflow = '';
+    });
+}
+
+if (bilanModal) {
+    bilanModal.addEventListener('click', (e) => {
+        if (e.target === bilanModal) {
+            bilanModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+document.addEventListener('keydown', (e) => {
+    if (bilanModal && bilanModal.style.display === 'flex' && (e.key === 'Escape' || e.key === 'Esc')) {
+        bilanModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});

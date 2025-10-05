@@ -220,6 +220,7 @@
                 <div id="results-content"></div>
                 <h3 class="result-title">Allez présenter le résultat au Maitre de Salle</h3>
                 <div class="button-container">
+                    <button class="calculate-btn" onclick="ouvrirBilanMaitre()">📋 Bilan Maître de Salle</button>
                     <button class="reset-btn" onclick="recommencer()">Nouveau Combat</button>
                 </div>
             </div>
@@ -339,6 +340,17 @@
                         ↓
                     </span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Bilan Maître de Salle -->
+    <div id="bilan-maitre-modal" class="modal-overlay" tabindex="-1" aria-modal="true" style="display:none;">
+        <div class="modal-content bilan-modal-content" role="dialog" aria-labelledby="bilan-modal-title">
+            <button class="modal-close" id="close-bilan-modal" aria-label="Fermer">✕</button>
+            <h2 id="bilan-modal-title" class="section-title" style="margin-top:0;">📋 Bilan Maître de Salle</h2>
+            <div class="bilan-content">
+                <div id="bilan-tableau"></div>
             </div>
         </div>
     </div>

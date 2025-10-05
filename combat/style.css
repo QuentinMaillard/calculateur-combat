@@ -227,6 +227,11 @@ input:disabled,
 .button-container {
     padding: 30px;
     text-align: center;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .calculate-btn,
@@ -607,6 +612,21 @@ footer a:focus img {
         align-items: center;
         display: flex;
     }
+    
+    /* Boutons responsifs sur mobile */
+    .button-container {
+        padding: 20px 15px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .calculate-btn,
+    .reset-btn {
+        width: 100%;
+        max-width: 280px;
+        padding: 14px 20px;
+        font-size: 1.1em;
+    }
 }
 
 @media (min-width: 769px) {
@@ -766,6 +786,101 @@ footer a:focus img {
 }
 
 /* ===========================
+   MODALE BILAN MAITRE DE SALLE
+   =========================== */
+.bilan-modal-content {
+    max-width: 800px;
+    width: 95vw;
+}
+
+.bilan-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.bilan-tableau {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.bilan-header {
+    background: linear-gradient(135deg, #bfa76a 0%, #8b6f47 100%);
+    color: white;
+    padding: 15px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.bilan-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.bilan-row:last-child {
+    border-bottom: none;
+}
+
+.bilan-row.header {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.bilan-village {
+    font-weight: 500;
+}
+
+.bilan-statut {
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.statut-gagnant {
+    background: #d4edda;
+    color: #155724;
+}
+
+.statut-perdant {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.statut-soutien {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.bilan-potions,
+.bilan-materiaux,
+.bilan-guerriers {
+    text-align: center;
+    font-weight: 500;
+}
+
+.gain {
+    color: #28a745;
+}
+
+.perte {
+    color: #dc3545;
+}
+
+.neutre {
+    color: #6c757d;
+}
+
+/* ===========================
    RESPONSIVE
    =========================== */
 @media (max-width: 968px) {
@@ -795,6 +910,42 @@ footer a:focus img {
         padding: 18px 6vw 18px 6vw;
         max-height: 95vh;
     }
+    
+    .bilan-modal-content {
+        width: 98vw;
+        padding: 15px;
+    }
+    
+    .bilan-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    .bilan-row.header {
+        display: none;
+    }
+    
+    .bilan-village {
+        font-size: 1.1em;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .bilan-statut,
+    .bilan-potions,
+    .bilan-materiaux,
+    .bilan-guerriers {
+        display: flex;
+        justify-content: space-between;
+        padding: 3px 0;
+    }
+    
+    .bilan-statut::before { content: "Statut: "; }
+    .bilan-potions::before { content: "Potions: "; }
+    .bilan-materiaux::before { content: "Matériaux: "; }
+    .bilan-guerriers::before { content: "Guerriers: "; }
 
     #help-btn {
         width: 48px;
