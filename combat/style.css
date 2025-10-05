@@ -539,6 +539,35 @@ footer a:focus img {
 }
 
 /* ===========================
+   BOUTON HOME
+   =========================== */
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: linear-gradient(135deg, #bfa76a 0%, #8b6f47 100%);
+    color: #ffffff;
+    border: 2px solid #a68b4a;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.12);
+    padding: 10px 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ===========================
    BOUTON D'AIDE FLOTTANT
    =========================== */
 #help-btn {

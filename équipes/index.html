@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur d'Équipes - Les Gaules</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">🏠 Accueil</a>
+    <div class="container">
+        <!-- Header avec recherche -->
+        <header class="header">
+            <h1>🏘️ Villages et Peuples - Répartition des Équipes</h1>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="studentSearch" 
+                    placeholder="🔍 Trouve ton équipe : tape ton nom ou prénom..."
+                    class="search-input"
+                >
+                <div id="searchResult" class="search-result">
+                </div>
+            </div>
+        </header>
+
+        <!-- Colonnes des peuples -->
+        <main class="peoples-grid">
+            <div class="people-column" data-people="Peuple de la forêt">
+                <h2 class="people-title">
+                    🌲 Peuple de la forêt
+                    <span class="master">Quentin</span>
+                </h2>
+                <div class="teams-container" id="teams-foret"></div>
+            </div>
+
+            <div class="people-column" data-people="Peuple de la vallée">
+                <h2 class="people-title">
+                    🏔️ Peuple de la vallée
+                    <span class="master">Lionel</span>
+                </h2>
+                <div class="teams-container" id="teams-vallee"></div>
+            </div>
+
+            <div class="people-column" data-people="Peuple des collines">
+                <h2 class="people-title">
+                    ⛰️ Peuple des collines
+                    <span class="master">Lou</span>
+                </h2>
+                <div class="teams-container" id="teams-collines"></div>
+            </div>
+
+            <div class="people-column" data-people="Peuple du plateau rocheux">
+                <h2 class="people-title">
+                    🏜️ Peuple du plateau rocheux
+                    <span class="master">Louis</span>
+                </h2>
+                <div class="teams-container" id="teams-plateau"></div>
+            </div>
+
+            <div class="people-column" data-people="Peuple du bord de mer">
+                <h2 class="people-title">
+                    🌊 Peuple du bord de mer
+                    <span class="master">Audeline</span>
+                </h2>
+                <div class="teams-container" id="teams-mer"></div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer style="width:100%; display:flex; justify-content:center; align-items:center; padding:32px 0 12px 0; background:transparent; margin-top: 2rem;">
+            <a href="https://www.linkedin.com/company/104192580/" target="_blank">
+                <img src="../combat/Assets/fondations.png" alt="Fondations"
+                     style="width:300px; max-width:90vw; height:auto; display:block; opacity:0.8;">
+            </a>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
