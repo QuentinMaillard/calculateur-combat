@@ -53,7 +53,6 @@ async function loadCSVData() {
     }
 }
 
-// Données de test si le CSV n'est pas accessible
 function loadTestData() {
     studentsData = [
         { nom: 'MUSTIÈRE', prenom: 'Charlotte', equipe: '1', peuplade: 'Peuple de la forêt', maitreSalle: 'Quentin' },
