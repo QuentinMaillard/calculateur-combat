@@ -1,12 +1,18 @@
 let gameData = {};
 
 document.getElementById('action-desiree').addEventListener('change', function () {
+    // Masquer tous les groupes de ressources
+    document.getElementById('potions-dispo-group').style.display = 'none';
+    document.getElementById('materiaux-dispo-group').style.display = 'none';
+    document.getElementById('argent-dispo-group').style.display = 'none';
+    
+    // Afficher le bon groupe selon l'action choisie
     if (this.value === 'potion') {
         document.getElementById('potions-dispo-group').style.display = '';
-        document.getElementById('materiaux-dispo-group').style.display = 'none';
-    } else {
-        document.getElementById('potions-dispo-group').style.display = 'none';
+    } else if (this.value === 'materiaux') {
         document.getElementById('materiaux-dispo-group').style.display = '';
+    } else if (this.value === 'argent') {
+        document.getElementById('argent-dispo-group').style.display = '';
     }
 });
 
@@ -61,10 +67,13 @@ function validerEtape1() {
 
     let potionsDisponibles = 0;
     let materiauxDisponibles = 0;
+    let argentDisponible = 0;
     if (ressourcesDesirees === 'potion') {
         potionsDisponibles = parseInt(document.getElementById('potions-disponibles').value) || 0;
-    } else {
+    } else if (ressourcesDesirees === 'materiaux') {
         materiauxDisponibles = parseInt(document.getElementById('materiaux-disponibles').value) || 0;
+    } else if (ressourcesDesirees === 'argent') {
+        argentDisponible = parseInt(document.getElementById('argent-disponible').value) || 0;
     }
 
     const errorMsg = document.getElementById('error-message');
@@ -116,7 +125,8 @@ function validerEtape1() {
         defenseur2Guerriers,
         ressourcesDesirees,
         potionsDisponibles,
-        materiauxDisponibles
+        materiauxDisponibles,
+        argentDisponible
     };
 
     // Remplir le récapitulatif
@@ -140,7 +150,9 @@ function validerEtape1() {
     document.getElementById('summary-defenseur-ressources').textContent =
         ressourcesDesirees === 'potion'
             ? (potionsDisponibles + ' potions')
-            : (materiauxDisponibles + ' matériaux');
+            : ressourcesDesirees === 'materiaux'
+            ? (materiauxDisponibles + ' matériaux')
+            : (argentDisponible + ' pièces d\'or');
 
     // Passer à l'étape 2
     document.getElementById('step2').classList.add('show');
@@ -394,7 +406,8 @@ function calculerCombat() {
         defenseur2Guerriers,
         ressourcesDesirees,
         potionsDisponibles,
-        materiauxDisponibles
+        materiauxDisponibles,
+        argentDisponible
     } = gameData;
 
     const aAllie = defenseur2Guerriers > 0;
@@ -442,24 +455,19 @@ function calculerCombat() {
                 //     ressourcesVolees = `${potionsDisponibles} potions + ${materiauxDisponibles} matériaux (stocks épuisés)`;
                 // }
             }
-        } else {
+        } else if (ressourcesDesirees === 'materiaux') {
             const X = materiauxDisponibles - V;
             if (X >= 0) {
                 ressourcesVolees = `${V} matériau(x)`;
             } else {
                 ressourcesVolees = `${materiauxDisponibles} matériau(x) (stocks épuisés)`;
-                // NE PAS SUPPRIMER CE CODE, il pourrait servir plus tard
-                // // Il manque de l'or, on regarde les matériaux
-                // const manque = potionsDisponibles - (-X);
-                // if (potionsDisponibles === 0 && materiauxDisponibles === 0) {
-                //     ressourcesVolees = `Aucun (stocks vides)`;
-                // } else if (potionsDisponibles === 0) {
-                //     ressourcesVolees = `${materiauxDisponibles} matériaux (stocks épuisés)`;
-                // } else if (manque >= 0) {
-                //     ressourcesVolees = `${materiauxDisponibles} matériaux + ${-X} or`;
-                // } else {
-                //     ressourcesVolees = `${materiauxDisponibles} matériaux + ${potionsDisponibles} or (stocks épuisés)`;
-                // }
+            }
+        } else if (ressourcesDesirees === 'argent') {
+            const X = argentDisponible - V;
+            if (X >= 0) {
+                ressourcesVolees = `${V} pièce(s) d'argent`;
+            } else {
+                ressourcesVolees = `${argentDisponible} pièce(s) d'argent (stocks épuisés)`;
             }
         }
     } else {
@@ -758,6 +766,8 @@ function checkPreparatifsValidity() {
     let ressourcesOk = false;
     if (actionDesiree === 'potion') {
         ressourcesOk = (document.getElementById('potions-disponibles').value !== '');
+    } else if (actionDesiree === 'argent') {
+        ressourcesOk = (document.getElementById('argent-disponible').value !== '');
     } else {
         ressourcesOk = (document.getElementById('materiaux-disponibles').value !== '');
     }
@@ -791,7 +801,7 @@ function checkPreparatifsValidity() {
 [
     'attaquant-nom', 'attaquant-guerriers', 'attaquant-potions',
     'defenseur1-nom', 'defenseur1-guerriers',
-    'action-desiree', 'potions-disponibles', 'materiaux-disponibles',
+    'action-desiree', 'potions-disponibles', 'materiaux-disponibles', 'argent-disponible',
     'defenseur2-nom', 'defenseur2-guerriers'
 ].forEach(id => {
     const el = document.getElementById(id);
@@ -931,7 +941,10 @@ function genererBilanTableau() {
             V = Math.ceil(V / 2);
         }
         const ressourcesDisponibles = ressourcesDesirees === 'potion' ? 
-            gameData.potionsDisponibles : gameData.materiauxDisponibles;
+            gameData.potionsDisponibles : 
+            ressourcesDesirees === 'materiaux' ?
+            gameData.materiauxDisponibles :
+            gameData.argentDisponible;
         ressourcesVolees = Math.min(V, ressourcesDisponibles);
     }
 
@@ -1014,6 +1027,7 @@ function genererBilanTableau() {
                 <div>Matériaux</div>
                 <div>Guerriers</div>
                 <div>Potions</div>
+                <div>Argent</div>
             </div>
     `;
 
@@ -1023,11 +1037,14 @@ function genererBilanTableau() {
     
     let potionsAttaquant = -attaquantPotions; // Consommées
     let materiauxAttaquant = 0;
+    let argentAttaquant = 0;
     
     if (R > 0 && ressourcesDesirees === 'potion') {
         potionsAttaquant += ressourcesVolees;
     } else if (R > 0 && ressourcesDesirees === 'materiaux') {
         materiauxAttaquant += ressourcesVolees;
+    } else if (R > 0 && ressourcesDesirees === 'argent') {
+        argentAttaquant += ressourcesVolees;
     }
 
     html += `
@@ -1043,6 +1060,9 @@ function genererBilanTableau() {
             <div class="bilan-potions ${potionsAttaquant > 0 ? 'gain' : potionsAttaquant < 0 ? 'perte' : 'neutre'}">
                 ${potionsAttaquant > 0 ? '+' : ''}${potionsAttaquant}
             </div>
+            <div class="bilan-argent ${argentAttaquant > 0 ? 'gain' : argentAttaquant < 0 ? 'perte' : 'neutre'}">
+                ${argentAttaquant > 0 ? '+' : ''}${argentAttaquant}
+            </div>
         </div>
     `;
 
@@ -1052,11 +1072,14 @@ function genererBilanTableau() {
     
     let potionsDefenseur1 = 0;
     let materiauxDefenseur1 = 0;
+    let argentDefenseur1 = 0;
     
     if (R > 0 && ressourcesDesirees === 'potion') {
         potionsDefenseur1 = -ressourcesVolees;
     } else if (R > 0 && ressourcesDesirees === 'materiaux') {
         materiauxDefenseur1 = -ressourcesVolees;
+    } else if (R > 0 && ressourcesDesirees === 'argent') {
+        argentDefenseur1 = -ressourcesVolees;
     }
 
     html += `
@@ -1072,6 +1095,9 @@ function genererBilanTableau() {
             <div class="bilan-potions ${potionsDefenseur1 > 0 ? 'gain' : potionsDefenseur1 < 0 ? 'perte' : 'neutre'}">
                 ${potionsDefenseur1 > 0 ? '+' : ''}${potionsDefenseur1}
             </div>
+            <div class="bilan-argent ${argentDefenseur1 > 0 ? 'gain' : argentDefenseur1 < 0 ? 'perte' : 'neutre'}">
+                ${argentDefenseur1 > 0 ? '+' : ''}${argentDefenseur1}
+            </div>
         </div>
     `;
 
@@ -1086,6 +1112,7 @@ function genererBilanTableau() {
                 ${pertesDefenseur2 > 0 ? '-' : ''}${pertesDefenseur2}
                 </div>
                 <div class="bilan-potions neutre">0</div>
+                <div class="bilan-argent neutre">0</div>
             </div>
         `;
     }

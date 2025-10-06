@@ -581,9 +581,26 @@ footer a:focus img {
         width: 100%;
     }
     
-    /* Le select Action désirée garde sa largeur normale */
+    /* Le select Action désirée garde sa largeur normale et est plus facilement utilisable sur mobile */
     #action-desiree {
         width: 100%;
+        font-size: 1.1em;
+        padding: 16px 12px;
+        min-height: 48px;
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 40px;
+    }
+    
+    /* Tous les selects sur mobile */
+    select {
+        font-size: 1.1em;
+        padding: 16px 12px;
+        min-height: 48px;
     }
     
     /* Labels étendus sur toute la largeur */
@@ -817,7 +834,7 @@ footer a:focus img {
 
 .bilan-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
     gap: 10px;
     padding: 12px 15px;
     border-bottom: 1px solid #eee;
@@ -893,10 +910,31 @@ footer a:focus img {
 
     .dice-input-section {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Forcer la disposition en colonne pour les dés sur mobile */
+    #dice-roll-result {
+        flex-direction: column !important;
+        gap: 20px !important;
     }
 
     .dice-separator {
         font-size: 2em;
+        margin: 10px 0;
+    }
+    
+    .dice-box {
+        padding: 20px;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .dice-box input {
+        width: 100px;
+        padding: 15px;
+        font-size: 1.8em;
     }
 
     h1 {
@@ -936,7 +974,8 @@ footer a:focus img {
     .bilan-statut,
     .bilan-potions,
     .bilan-materiaux,
-    .bilan-guerriers {
+    .bilan-guerriers,
+    .bilan-argent {
         display: flex;
         justify-content: space-between;
         padding: 3px 0;
@@ -946,6 +985,7 @@ footer a:focus img {
     .bilan-potions::before { content: "Potions: "; }
     .bilan-materiaux::before { content: "Matériaux: "; }
     .bilan-guerriers::before { content: "Guerriers: "; }
+    .bilan-argent::before { content: "Argent: "; }
 
     #help-btn {
         width: 48px;
