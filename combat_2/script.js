@@ -1,0 +1,1323 @@
+let gameData = {};
+
+document.getElementById('action-desiree').addEventListener('change', function () {
+    // Masquer tous les groupes de ressources
+    document.getElementById('materiaux-dispo-group').style.display = 'none';
+    document.getElementById('argent-dispo-group').style.display = 'none';
+    
+    // Afficher le bon groupe selon l'action choisie
+    if (this.value === 'materiaux') {
+        document.getElementById('materiaux-dispo-group').style.display = '';
+    } else if (this.value === 'argent') {
+        document.getElementById('argent-dispo-group').style.display = '';
+    }
+});
+
+// Limite dynamique sur le champ Potions utilisées (M1) : max = Guerriers (G1)
+const attaquantGuerriersInput = document.getElementById('attaquant-guerriers');
+const attaquantPotionsInput = document.getElementById('attaquant-potions');
+const attaquant2GuerriersInput = document.getElementById('attaquant2-guerriers');
+const attaquant2PotionsInput = document.getElementById('attaquant2-potions');
+
+function updateMaxPotions() {
+    const g1 = parseInt(attaquantGuerriersInput.value) || 0;
+    attaquantPotionsInput.max = g1;
+    document.getElementById('attaquant-potions-max').textContent = g1;
+    // Si la valeur actuelle dépasse le max, on la ramène au max
+    if (parseInt(attaquantPotionsInput.value) > g1) {
+        attaquantPotionsInput.value = g1;
+    }
+    // Désactive le champ potion si aucun guerrier n'est engagé
+    attaquantPotionsInput.disabled = g1 === 0;
+    if (g1 === 0) {
+        attaquantPotionsInput.value = 0;
+    }
+}
+
+function updateMaxPotions2() {
+    const g2 = parseInt(attaquant2GuerriersInput.value) || 0;
+    attaquant2PotionsInput.max = g2;
+    document.getElementById('attaquant2-potions-max').textContent = g2;
+    // Si la valeur actuelle dépasse le max, on la ramène au max
+    if (parseInt(attaquant2PotionsInput.value) > g2) {
+        attaquant2PotionsInput.value = g2;
+    }
+    // Désactive le champ potion si aucun guerrier n'est engagé
+    attaquant2PotionsInput.disabled = g2 === 0;
+    if (g2 === 0) {
+        attaquant2PotionsInput.value = 0;
+    }
+}
+
+attaquantGuerriersInput.addEventListener('input', updateMaxPotions);
+attaquant2GuerriersInput.addEventListener('input', updateMaxPotions2);
+
+// Appel initial pour l'état au chargement
+updateMaxPotions();
+updateMaxPotions2();
+
+// Vérification supplémentaire lors de la validation
+function validerEtape1() {
+    const attaquantNom = document.getElementById('attaquant-nom').value.trim();
+    const attaquantGuerriers = parseInt(document.getElementById('attaquant-guerriers').value) || 0;
+    const attaquantPotions = parseInt(document.getElementById('attaquant-potions').value) || 0;
+    const attaquant2Nom = document.getElementById('attaquant2-nom').value.trim();
+    const attaquant2Guerriers = parseInt(document.getElementById('attaquant2-guerriers').value) || 0;
+    const attaquant2Potions = parseInt(document.getElementById('attaquant2-potions').value) || 0;
+    const defenseur1Nom = document.getElementById('defenseur1-nom').value.trim();
+    const defenseur1Guerriers = parseInt(document.getElementById('defenseur1-guerriers').value) || 0;
+    // Défenseur ne peut plus utiliser de potion
+    // const defenseur1Potions = parseInt(document.getElementById('defenseur1-potions').value) || 0;
+    const oppidumActif = document.getElementById('oppidum-actif').checked;
+    const defenseur2Nom = document.getElementById('defenseur2-nom').value.trim();
+    const defenseur2Guerriers = parseInt(document.getElementById('defenseur2-guerriers').value) || 0;
+    const ressourcesDesirees = document.getElementById('action-desiree').value;
+
+    let materiauxDisponibles = 0;
+    let argentDisponible = 0;
+    if (ressourcesDesirees === 'materiaux') {
+        materiauxDisponibles = parseInt(document.getElementById('materiaux-disponibles').value) || 0;
+    } else if (ressourcesDesirees === 'argent') {
+        argentDisponible = parseInt(document.getElementById('argent-disponible').value) || 0;
+    }
+
+    const errorMsg = document.getElementById('error-message');
+    errorMsg.classList.remove('show');
+
+    // Validations
+    if (!attaquantNom) {
+        errorMsg.textContent = "⚠️ Le nom du village attaquant est requis";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (!defenseur1Nom) {
+        errorMsg.textContent = "⚠️ Le nom du village défenseur est requis";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (attaquantGuerriers === 0 && attaquantPotions === 0 && attaquant2Guerriers === 0 && attaquant2Potions === 0) {
+        errorMsg.textContent = "⚠️ L'attaquant doit engager au moins des guerriers ou des Guerriers sous potion";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (attaquant2Guerriers > 0 && !attaquant2Nom) {
+        errorMsg.textContent = "⚠️ Si un allié attaquant envoie des guerriers, son nom doit être renseigné";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (defenseur2Guerriers > 0 && !defenseur2Nom) {
+        errorMsg.textContent = "⚠️ Si un allié défenseur envoie des guerriers, son nom doit être renseigné";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (attaquantPotions > attaquantGuerriers) {
+        errorMsg.textContent = "⚠️ Vous ne pouvez pas utiliser plus de potions que de guerriers engagés (attaquant principal).";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (attaquant2Potions > attaquant2Guerriers) {
+        errorMsg.textContent = "⚠️ Vous ne pouvez pas utiliser plus de potions que de guerriers engagés (attaquant allié).";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    // Plus de vérification de potions défenseur
+
+    // Stocker les données
+    gameData = {
+        attaquantNom,
+        attaquantGuerriers,
+        attaquantPotions,
+        attaquant2Nom,
+        attaquant2Guerriers,
+        attaquant2Potions,
+        defenseur1Nom,
+        defenseur1Guerriers,
+        // defenseur1Potions: 0, // plus utilisé
+        oppidumActif,
+        defenseur2Nom,
+        defenseur2Guerriers,
+        ressourcesDesirees,
+        materiauxDisponibles,
+        argentDisponible
+    };
+
+    // Remplir le récapitulatif
+    document.getElementById('summary-attaquant-nom').textContent = attaquantNom;
+    document.getElementById('summary-attaquant-guerriers').textContent = attaquantGuerriers;
+    document.getElementById('summary-attaquant-potions').textContent = attaquantPotions;
+    document.getElementById('summary-ressources').textContent = ressourcesDesirees === 'materiaux' ? 'Matériaux' : 'Argent';
+
+    // Afficher l'attaquant allié si présent
+    if (attaquant2Guerriers > 0) {
+        document.getElementById('summary-attaquant-allie-nom').textContent = attaquant2Nom;
+        document.getElementById('summary-attaquant-allie-guerriers').textContent = attaquant2Guerriers;
+        document.getElementById('summary-attaquant-allie-potions').textContent = attaquant2Potions;
+        document.getElementById('summary-attaquant-allie-line').style.display = 'block';
+    } else {
+        document.getElementById('summary-attaquant-allie-line').style.display = 'none';
+    }
+
+    document.getElementById('summary-defenseur-nom').textContent = defenseur1Nom;
+    document.getElementById('summary-defenseur-guerriers').textContent = defenseur1Guerriers;
+    document.getElementById('summary-oppidum').textContent = oppidumActif ? "Oui (x2)" : "Non";
+
+    if (defenseur2Guerriers > 0) {
+        document.getElementById('summary-allie-nom').textContent = defenseur2Nom;
+        document.getElementById('summary-allie-guerriers').textContent = defenseur2Guerriers;
+        document.getElementById('summary-allie-line').style.display = 'block';
+    } else {
+        document.getElementById('summary-allie-line').style.display = 'none';
+    }
+
+    document.getElementById('summary-defenseur-ressources').textContent =
+        ressourcesDesirees === 'materiaux'
+            ? (materiauxDisponibles + ' matériaux')
+            : (argentDisponible + ' pièces d\'or');
+
+    // Passer à l'étape 2
+    document.getElementById('step2').classList.add('show');
+    document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
+}
+
+// --- Animation de décompte et confettis ---
+
+// Sauvegarde la fonction d'origine
+const ancienneCalculerCombat = window.calculerCombat || calculerCombat;
+
+window.calculerCombat = function () {
+    // Ajoute la fondu au noir AVANT le countdown
+    const fade = document.getElementById('fade-black');
+    const overlay = document.getElementById('countdown-overlay');
+    const number = document.getElementById('countdown-number');
+
+    // Affiche le fondu noir
+    fade.style.display = 'block';
+    fade.style.opacity = '0';
+    setTimeout(() => {
+        fade.style.opacity = '1';
+    }, 0);
+
+    // Après la transition (0.5s), affiche la vidéo/countdown et retire le noir
+    setTimeout(() => {
+        fade.style.opacity = '0';
+        overlay.style.display = 'flex';
+        document.body.classList.add('countdown-active');
+        number.textContent = '5';
+
+        // Cache le fondu noir après la transition
+        setTimeout(() => {
+            fade.style.display = 'none';
+        }, 300);
+
+        let count = 5;
+        let interval = setInterval(() => {
+            count--;
+            number.textContent = count;
+            if (count <= 0) {
+                clearInterval(interval);
+                overlay.style.display = 'none';
+                document.body.classList.remove('countdown-active');
+                ancienneCalculerCombat();
+                lancerConfettis();
+            }
+        }, 1000);
+    }, 500);
+};
+
+// --- Confettis ---
+function lancerConfettis() {
+    const canvas = document.getElementById('confetti-canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+    canvas.style.opacity = '1'; // reset opacity
+
+    const ctx = canvas.getContext('2d');
+    const confettis = [];
+    const colors = [
+        '#FFD700', '#FF6347', '#00FF7F', '#1E90FF', '#bfa76a', '#8b6f47', '#b85450', '#fffbe6', '#fc6c85', '#d73a49', '#667eea', '#764ba2'
+    ];
+
+    const CONFETTI_COUNT = Math.floor(window.innerWidth / 4);
+    for (let i = 0; i < CONFETTI_COUNT; i++) {
+        confettis.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * -canvas.height,
+            r: 6 + Math.random() * 10,
+            d: 10 + Math.random() * 18,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 20 - 10,
+            tiltAngle: 0,
+            tiltAngleIncremental: (Math.random() * 0.12) + 0.08,
+            speed: 2 + Math.random() * 3
+        });
+    }
+
+    let angle = 0;
+    let frame = 0;
+    const DURATION = 360; // ~6 secondes à 60fps
+
+    function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        angle += 0.02;
+        for (let i = 0; i < confettis.length; i++) {
+            let c = confettis[i];
+            c.y += (Math.cos(angle + c.d) + 3 + c.r / 2) / 2 + c.speed;
+            c.x += Math.sin(angle) * 2;
+            c.tiltAngle += c.tiltAngleIncremental;
+            c.tilt = Math.sin(c.tiltAngle) * 18;
+
+            if (c.y > canvas.height + 20) {
+                c.x = Math.random() * canvas.width;
+                c.y = -20;
+                c.tilt = Math.random() * 20 - 10;
+            }
+
+            ctx.beginPath();
+            ctx.lineWidth = c.r;
+            ctx.strokeStyle = c.color;
+            ctx.moveTo(c.x + c.tilt + c.r / 3, c.y);
+            ctx.lineTo(c.x + c.tilt, c.y + c.d);
+            ctx.stroke();
+        }
+        frame++;
+        if (frame < DURATION) {
+            requestAnimationFrame(drawConfetti);
+        }
+        if (frame > DURATION - 75) {
+            // Fade out
+            canvas.style.transition = 'opacity 0.75s';
+            canvas.style.opacity = '0';
+            setTimeout(() => {
+                canvas.style.display = 'none';
+                canvas.style.transition = '';
+                canvas.style.opacity = '1';
+            }, 750);
+        }
+    }
+    drawConfetti();
+}
+
+// Pour que le canvas suive le redimensionnement même pendant l'animation
+window.addEventListener('resize', () => {
+    const canvas = document.getElementById('confetti-canvas');
+    if (canvas.style.display !== 'none') {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+});
+
+
+
+// Gestion du nouveau flux de dés indépendants
+const diceResultDiv = document.getElementById('dice-roll-result');
+const attaquantDeResult = document.getElementById('attaquant-de-result');
+const defenseurDeResult = document.getElementById('defenseur-de-result');
+const rollDiceAttaquantBtn = document.getElementById('roll-dice-attaquant');
+const rollDiceDefenseurBtn = document.getElementById('roll-dice-defenseur');
+const calcBtn = document.getElementById('calculate-btn');
+
+let attaquantDe = null;
+let defenseurDe = null;
+
+function updateCalcBtnState() {
+    if (typeof attaquantDe === 'number' && typeof defenseurDe === 'number') {
+        calcBtn.disabled = false;
+        calcBtn.style.opacity = 1;
+        calcBtn.style.pointerEvents = '';
+    } else {
+        calcBtn.disabled = true;
+        calcBtn.style.opacity = 0.6;
+        calcBtn.style.pointerEvents = 'none';
+    }
+}
+
+function resetDiceSection() {
+    attaquantDe = null;
+    defenseurDe = null;
+    attaquantDeResult.textContent = '?';
+    defenseurDeResult.textContent = '?';
+    updateCalcBtnState();
+}
+
+function animateDiceRoll(resultSpan, callback) {
+    let ticks = 0;
+    // Allonge l'animation de 0.5s (environ 14 ticks de plus)
+    const maxTicks = 32 + Math.floor(Math.random() * 8); // 32-39 ticks (env. 1.1-1.4s)
+    const interval = 35; // ms
+    let lastValue = null;
+    const roll = setInterval(() => {
+        let val = Math.floor(Math.random() * 10) + 1;
+        // éviter de répéter le même chiffre
+        if (val === lastValue) val = (val % 10) + 1;
+        resultSpan.textContent = val;
+        lastValue = val;
+        ticks++;
+        if (ticks >= maxTicks) {
+            clearInterval(roll);
+            setTimeout(callback, 80); // petit délai pour l'effet
+        }
+    }, interval);
+}
+
+if (rollDiceAttaquantBtn) {
+    rollDiceAttaquantBtn.addEventListener('click', function () {
+        rollDiceAttaquantBtn.textContent = 'Alea jacta est';
+        rollDiceAttaquantBtn.disabled = true;
+        rollDiceAttaquantBtn.classList.add('disabled');
+        animateDiceRoll(attaquantDeResult, function () {
+            attaquantDe = Math.floor(Math.random() * 10) + 1;
+            attaquantDeResult.textContent = attaquantDe;
+            // Le bouton reste désactivé après le lancer
+            updateCalcBtnState();
+        });
+    });
+}
+if (rollDiceDefenseurBtn) {
+    rollDiceDefenseurBtn.addEventListener('click', function () {
+        rollDiceDefenseurBtn.textContent = 'Alea jacta est';
+        rollDiceDefenseurBtn.disabled = true;
+        rollDiceDefenseurBtn.classList.add('disabled');
+        animateDiceRoll(defenseurDeResult, function () {
+            defenseurDe = Math.floor(Math.random() * 10) + 1;
+            defenseurDeResult.textContent = defenseurDe;
+            // Le bouton reste désactivé après le lancer
+            updateCalcBtnState();
+        });
+    });
+}
+
+// Réinitialise le bouton lors d'un nouveau combat
+function resetCalcBtn() {
+    resetDiceSection();
+}
+document.querySelector('.reset-btn').addEventListener('click', resetCalcBtn);
+
+
+
+function calculerCombat() {
+    // Utilise les valeurs de dés stockées
+    if (typeof attaquantDe !== 'number' || typeof defenseurDe !== 'number') return;
+
+    const errorMsg = document.getElementById('error-message-dice');
+    errorMsg.classList.remove('show');
+
+    // Validations
+    if (attaquantDe < 1 || attaquantDe > 10) {
+        errorMsg.textContent = "⚠️ Le jet de dé de l'attaquant doit être entre 1 et 10";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    if (defenseurDe < 1 || defenseurDe > 10) {
+        errorMsg.textContent = "⚠️ Le jet de dé du défenseur doit être entre 1 et 10";
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    const {
+        attaquantNom,
+        attaquantGuerriers,
+        attaquantPotions,
+        attaquant2Nom,
+        attaquant2Guerriers,
+        attaquant2Potions,
+        defenseur1Nom,
+        defenseur1Guerriers,
+        oppidumActif,
+        defenseur2Nom,
+        defenseur2Guerriers,
+        ressourcesDesirees,
+        materiauxDisponibles,
+        argentDisponible
+    } = gameData;
+
+    const aAllieAttaquant = attaquant2Guerriers > 0;
+    const aAllieDefenseur = defenseur2Guerriers > 0;
+
+    // Calculs de combat
+    // Oppidum : ajoute +G2 (et +G3 si allié) à la défense, mais ne double plus les effectifs
+    let defenseur1GuerriersEff = defenseur1Guerriers;
+    let defenseur2GuerriersEff = defenseur2Guerriers;
+    let bonusOppidum = 0;
+    if (oppidumActif) {
+        bonusOppidum += defenseur1Guerriers*0.5; // 50% de bonus
+        if (defenseur2Guerriers > 0) {
+            bonusOppidum += defenseur2Guerriers*0.5; // 50% de bonus
+        }
+    }
+
+    // Potion donne un bonus de +0.5 par potion utilisée à l'attaque (pour tous les attaquants)
+    const totalAttaquantGuerriers = attaquantGuerriers + attaquant2Guerriers;
+    const totalAttaquantPotions = attaquantPotions + attaquant2Potions;
+    const A = totalAttaquantGuerriers + attaquantDe + (totalAttaquantPotions * 0.5);
+    const D = defenseur1GuerriersEff + defenseur2GuerriersEff + bonusOppidum + defenseurDe;
+    const R = A - D;
+
+    // Calcul des ressources volées (inchangé)
+    let V = 0;
+    let ressourcesVolees = '';
+    if (R > 0) {
+        V = Math.ceil(R / 2);
+
+        if (ressourcesDesirees === 'materiaux') {
+            const X = materiauxDisponibles - V;
+            if (X >= 0) {
+                ressourcesVolees = `${V} matériau(x)`;
+            } else {
+                ressourcesVolees = `${materiauxDisponibles} matériau(x) (stocks épuisés)`;
+            }
+        } else if (ressourcesDesirees === 'argent') {
+            const X = argentDisponible - V;
+            if (X >= 0) {
+                ressourcesVolees = `${V} pièce(s) d'argent`;
+            } else {
+                ressourcesVolees = `${argentDisponible} pièce(s) d'argent (stocks épuisés)`;
+            }
+        }
+    } else {
+        ressourcesVolees = 'Aucune';
+    }
+
+    /**
+     * Nouveau système de pertes réalistes basé sur la taille totale des armées
+     * @param {number} guerriers - Guerriers engagés pour ce camp
+     * @param {number} de - Jet de dé de ce camp
+     * @param {number} guerriersAdverse - Guerriers engagés pour l'adversaire
+     * @param {number} deAdverse - Jet de dé de l'adversaire
+     * @param {boolean} victoire - true si ce camp a gagné, false sinon
+     * @param {boolean} estAttaquant - true si ce camp attaque, false si défend
+     * @param {number} tailleTotale - Taille totale des deux armées combinées
+     * @returns {{ pertes: number, pourcentage: number }}
+     */
+    function calculerPertesAvancees(guerriers, de, guerriersAdverse, deAdverse, victoire, estAttaquant, tailleTotale) {
+        if (guerriers === 0) return { pertes: 0, pourcentage: 0 };
+
+        // 1. Facteur d'intensité basé sur la taille totale du combat
+        let facteurIntensite;
+        if (tailleTotale <= 30) facteurIntensite = 0.8;      // Petite escarmouche
+        else if (tailleTotale <= 80) facteurIntensite = 1.0; // Bataille moyenne  
+        else if (tailleTotale <= 150) facteurIntensite = 1.2; // Grande bataille
+        else facteurIntensite = 1.5;                          // Guerre massive
+
+        // 2. Pertes de base selon l'issue du combat
+        let pourcentageBase;
+        if (victoire) {
+            // Vainqueur : pertes plus faibles mais significatives
+            if (tailleTotale <= 30) pourcentageBase = 12;
+            else if (tailleTotale <= 80) pourcentageBase = 15;
+            else if (tailleTotale <= 150) pourcentageBase = 20;
+            else pourcentageBase = 25;
+        } else {
+            // Perdant : pertes lourdes
+            if (tailleTotale <= 30) pourcentageBase = 20;
+            else if (tailleTotale <= 80) pourcentageBase = 28;
+            else if (tailleTotale <= 150) pourcentageBase = 35;
+            else pourcentageBase = 45;
+        }
+
+        // 3. Modificateur attaquant/défenseur
+        if (estAttaquant) {
+            pourcentageBase += 3; // Malus attaquant (assaut difficile)
+        } else {
+            pourcentageBase = Math.max(1, pourcentageBase - 2); // Bonus défenseur (avantage terrain)
+        }
+
+        // 4. Modificateur de férocité basé sur les dés
+        const ecartDes = Math.abs(de - deAdverse);
+        let modificateurFerocite = 0;
+        
+        // La férocité s'applique selon qui a le meilleur dé
+        const meilleurDe = de > deAdverse;
+        if (ecartDes >= 3 && ecartDes <= 4) modificateurFerocite = 5;
+        else if (ecartDes >= 5 && ecartDes <= 6) modificateurFerocite = 8;
+        else if (ecartDes >= 7) modificateurFerocite = 12;
+
+        // Si ce camp a le meilleur dé, il inflige plus de dégâts à l'adversaire
+        // Donc ses propres pertes diminuent légèrement
+        if (meilleurDe && modificateurFerocite > 0) {
+            pourcentageBase = Math.max(5, pourcentageBase - Math.floor(modificateurFerocite / 2));
+        }
+        // Si ce camp a le moins bon dé, l'adversaire lui inflige plus de dégâts
+        else if (!meilleurDe && modificateurFerocite > 0) {
+            pourcentageBase += modificateurFerocite;
+        }
+
+        // 5. Application du facteur d'intensité
+        const pourcentageFinal = Math.max(5, Math.min(60, pourcentageBase * facteurIntensite));
+        
+        return {
+            pertes: Math.ceil(guerriers * (pourcentageFinal / 100)),
+            pourcentage: Math.round(pourcentageFinal * 10) / 10
+        };
+    }
+
+    // Calcul des pertes brutes avec le nouveau système
+    const tailleTotaleCombat = totalAttaquantGuerriers + defenseur1GuerriersEff + defenseur2GuerriersEff;
+    
+    const pertesAttaquantBrut = calculerPertesAvancees(
+        attaquantGuerriers,
+        attaquantDe,
+        defenseur1GuerriersEff + defenseur2GuerriersEff,
+        defenseurDe,
+        R > 0,
+        true, // Est attaquant
+        tailleTotaleCombat
+    );
+
+    const pertesAttaquant2Brut = aAllieAttaquant
+        ? calculerPertesAvancees(
+            attaquant2Guerriers,
+            attaquantDe,
+            defenseur1GuerriersEff + defenseur2GuerriersEff,
+            defenseurDe,
+            R > 0,
+            true, // Est attaquant
+            tailleTotaleCombat
+        )
+        : { pertes: 0, pourcentage: 0 };
+
+    const pertesDefenseur1Brut = calculerPertesAvancees(
+        defenseur1Guerriers,
+        defenseurDe,
+        totalAttaquantGuerriers,
+        attaquantDe,
+        R <= 0,
+        false, // Est défenseur
+        tailleTotaleCombat
+    );
+
+    const pertesDefenseur2Brut = aAllieDefenseur
+        ? calculerPertesAvancees(
+            defenseur2Guerriers,
+            defenseurDe,
+            totalAttaquantGuerriers,
+            attaquantDe,
+            R <= 0,
+            false, // Est défenseur
+            tailleTotaleCombat
+        )
+        : { pertes: 0, pourcentage: 0 };
+
+    // Application de la protection par potion (uniquement attaquants)
+    const pertesAttaquant = Math.max(0, pertesAttaquantBrut.pertes - attaquantPotions);
+    const pertesAttaquant2 = Math.max(0, pertesAttaquant2Brut.pertes - attaquant2Potions);
+
+    // Oppidum : 1 chance sur 2 de sauver chaque soldat défenseur (principal et allié)
+    function oppidumSauve(pertes, oppidumActif) {
+        if (!oppidumActif || pertes === 0) return pertes;
+        let sauves = 0;
+        for (let i = 0; i < pertes; i++) {
+            if (Math.random() < 0.5) sauves++;
+        }
+        return pertes - sauves;
+    }
+
+    const pertesDefenseur1 = oppidumSauve(pertesDefenseur1Brut.pertes, oppidumActif);
+    const pertesDefenseur2 = oppidumSauve(pertesDefenseur2Brut.pertes, oppidumActif);
+
+    const pertesDefenseur1Sauvées = oppidumActif ? (pertesDefenseur1Brut.pertes - pertesDefenseur1) : 0;
+    const pertesDefenseur2Sauvées = oppidumActif ? (pertesDefenseur2Brut.pertes - pertesDefenseur2) : 0;
+
+    const vainqueur = R > 0 ? attaquantNom : defenseur1Nom;
+    const vainqueurClass = R > 0 ? 'attaquant' : 'defenseur';
+
+    // Affichage du total théorique de ressources à capter
+    let theoriqueVole = '';
+    if (R > 0) {
+        theoriqueVole = `<div style="font-size:1em; color:#888; margin-bottom:8px;">
+        Total théorique à piller : <strong>${V}</strong> ressources
+    </div>`;
+    }
+
+    // Calcul de l'intensité du combat pour l'affichage
+    let intensiteTexte = '';
+    if (tailleTotaleCombat <= 30) intensiteTexte = 'Escarmouche';
+    else if (tailleTotaleCombat <= 80) intensiteTexte = 'Bataille';
+    else if (tailleTotaleCombat <= 150) intensiteTexte = 'Grande bataille';
+    else intensiteTexte = 'Guerre massive';
+
+    const ecartDes = Math.abs(attaquantDe - defenseurDe);
+    let ferociteTexte = '';
+    if (ecartDes >= 7) ferociteTexte = 'Combat acharné';
+    else if (ecartDes >= 5) ferociteTexte = 'Combat intense';
+    else if (ecartDes >= 3) ferociteTexte = 'Combat équilibré';
+    else ferociteTexte = 'Combat modéré';
+
+    let html = `
+                <div class="winner-banner ${vainqueurClass}">
+                    🏆 Victoire ${vainqueurClass === 'attaquant' ? "de l'attaquant" : "du défenseur"} ${vainqueur} !
+                </div>
+
+                <div class="battle-summary">
+                    <div class="summary-row">
+                        <div class="summary-box attaquant-summary">
+                            <h3>🤺 Camp Attaquant</h3>
+                            <div class="summary-stats">
+                                <div class="stat-line"><span class="stat-label">Total guerriers :</span> <span class="stat-value">${totalAttaquantGuerriers}</span></div>
+                                <div class="stat-line"><span class="stat-label">Potions utilisées :</span> <span class="stat-value">${totalAttaquantPotions}</span></div>
+                                <div class="stat-line"><span class="stat-label">Jet de dé :</span> <span class="stat-value">${attaquantDe}</span></div>
+                                <div class="stat-line"><span class="stat-label">Force totale :</span> <span class="stat-value">${A}</span></div>
+                            </div>
+                            <button class="toggle-details" onclick="toggleAttaquantDetails()" style="margin-top:8px; padding:4px 12px; font-size:0.9em; background:#8b6f47; color:white; border:none; border-radius:4px; cursor:pointer;">
+                                📊 Voir détails
+                            </button>
+                            <div id="attaquant-details" class="combat-details" style="display:none; margin-top:8px; padding:8px; background:rgba(139,111,71,0.1); border-radius:4px; font-size:0.9em;">
+                                <div class="detail-line">• ${attaquantNom} : ${attaquantGuerriers} guerriers + ${attaquantPotions} potions</div>
+                                ${aAllieAttaquant ? `<div class="detail-line">• ${attaquant2Nom} : ${attaquant2Guerriers} guerriers + ${attaquant2Potions} potions</div>` : ''}
+                                <div class="detail-line">• Bonus potions : +${(totalAttaquantPotions * 0.5).toFixed(1)}</div>
+                                <div class="detail-line">• Malus assaut : +3% pertes</div>
+                                <div class="detail-line"><strong>Calcul : ${totalAttaquantGuerriers} + ${attaquantDe} + ${(totalAttaquantPotions * 0.5).toFixed(1)} = ${A}</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="summary-box defenseur-summary">
+                            <h3>🛡️ Camp Défenseur</h3>
+                            <div class="summary-stats">
+                                <div class="stat-line"><span class="stat-label">Total guerriers :</span> <span class="stat-value">${defenseur1Guerriers + defenseur2Guerriers}</span></div>
+                                <div class="stat-line"><span class="stat-label">Bonus oppidum :</span> <span class="stat-value">${oppidumActif ? '+' + bonusOppidum.toFixed(1) : 'Aucun'}</span></div>
+                                <div class="stat-line"><span class="stat-label">Jet de dé :</span> <span class="stat-value">${defenseurDe}</span></div>
+                                <div class="stat-line"><span class="stat-label">Force totale :</span> <span class="stat-value">${D}</span></div>
+                            </div>
+                            <button class="toggle-details" onclick="toggleDefenseurDetails()" style="margin-top:8px; padding:4px 12px; font-size:0.9em; background:#8b6f47; color:white; border:none; border-radius:4px; cursor:pointer;">
+                                � Voir détails  
+                            </button>
+                            <div id="defenseur-details" class="combat-details" style="display:none; margin-top:8px; padding:8px; background:rgba(139,111,71,0.1); border-radius:4px; font-size:0.9em;">
+                                <div class="detail-line">• ${defenseur1Nom} : ${defenseur1Guerriers} guerriers</div>
+                                ${aAllieDefenseur ? `<div class="detail-line">• ${defenseur2Nom} : ${defenseur2Guerriers} guerriers</div>` : ''}
+                                ${oppidumActif ? `<div class="detail-line">• Bonus oppidum : +${bonusOppidum.toFixed(1)} (50% des effectifs)</div>` : ''}
+                                <div class="detail-line">• Bonus terrain : -2% pertes</div>
+                                <div class="detail-line"><strong>Calcul : ${defenseur1Guerriers} + ${defenseur2Guerriers} ${oppidumActif ? '+ ' + bonusOppidum.toFixed(1) : ''} + ${defenseurDe} = ${D}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="battle-context" style="text-align:center; margin:16px 0; padding:12px; background:rgba(191,167,106,0.1); border-radius:8px;">
+                        <div style="font-size:1.1em; font-weight:500; color:#bfa76a; margin-bottom:4px;">
+                            ${intensiteTexte} • ${ferociteTexte}
+                        </div>
+                        <div style="font-size:0.9em; color:#888;">
+                            ${tailleTotaleCombat} guerriers au total • Écart de dés: ${ecartDes}
+                        </div>
+                    </div>
+                </div>
+
+                ${theoriqueVole}
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Ressources pillées</div>
+                        <div class="result-value" style="font-size: 1.5em;">${ressourcesVolees}</div>
+                    </div>
+
+                    <div class="result-box">
+                        <div class="result-label">Pertes ${attaquantNom}</div>
+                        <div class="result-value">${pertesAttaquant} guerriers</div>
+                        <div class="result-detail" style="font-size:0.95em; color:#888;">(${pertesAttaquantBrut.pertes} pertes brutes − ${attaquantPotions} potions)</div>
+                    </div>
+
+                    ${aAllieAttaquant ? `
+                    <div class="result-box">
+                        <div class="result-label">Pertes ${attaquant2Nom}</div>
+                        <div class="result-value">${pertesAttaquant2} guerriers</div>
+                        <div class="result-detail" style="font-size:0.95em; color:#888;">(${pertesAttaquant2Brut.pertes} pertes brutes − ${attaquant2Potions} potions)</div>
+                    </div>
+                    ` : ''}
+
+                    <div class="result-box">
+                        <div class="result-label">Pertes ${defenseur1Nom}</div>
+                        <div class="result-value">${pertesDefenseur1} guerriers</div>
+                        <div class="result-detail" style="font-size:0.95em; color:#888;">
+                            (${pertesDefenseur1Brut.pertes} pertes brutes
+                            ${oppidumActif ? `, ${pertesDefenseur1Sauvées} sauvés par les remparts` : ''})
+                        </div>
+                    </div>
+
+                    ${aAllieDefenseur ? `
+                    <div class="result-box">
+                        <div class="result-label">Pertes ${defenseur2Nom}</div>
+                        <div class="result-value">${pertesDefenseur2} guerriers</div>
+                        <div class="result-detail" style="font-size:0.95em; color:#888;">
+                            (${pertesDefenseur2Brut.pertes} pertes brutes
+                            ${oppidumActif ? `, ${pertesDefenseur2Sauvées} sauvés par les remparts` : ''})
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+
+    // Stocker les résultats du combat pour le bilan maître de salle
+    gameData.resultats = {
+        A, D, R,
+        ressourcesVolees: V,
+        pertesAttaquant,
+        pertesAttaquant2,
+        pertesDefenseur1,
+        pertesDefenseur2,
+        aAllieAttaquant,
+        aAllieDefenseur,
+        attaquantDe,
+        defenseurDe
+    };
+
+    document.getElementById('results-content').innerHTML = html;
+    document.getElementById('results').classList.add('show');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Fonctions pour les toggles de détails
+function toggleAttaquantDetails() {
+    const details = document.getElementById('attaquant-details');
+    const button = document.querySelector('.attaquant-summary .toggle-details');
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        button.textContent = '📊 Masquer détails';
+    } else {
+        details.style.display = 'none';
+        button.textContent = '📊 Voir détails';
+    }
+}
+
+function toggleDefenseurDetails() {
+    const details = document.getElementById('defenseur-details');
+    const button = document.querySelector('.defenseur-summary .toggle-details');
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        button.textContent = '📊 Masquer détails';
+    } else {
+        details.style.display = 'none';
+        button.textContent = '📊 Voir détails';
+    }
+}
+
+function recommencer() {
+    // // Réinitialiser tous les champs
+    // document.getElementById('attaquant-nom').value = '';
+    // document.getElementById('attaquant-guerriers').value = '0';
+    // document.getElementById('attaquant-potions').value = '0';
+    // document.getElementById('defenseur1-nom').value = '';
+    // document.getElementById('defenseur1-guerriers').value = '0';
+    // document.getElementById('defenseur1-potions').value = '0';
+    // document.getElementById('oppidum-actif').checked = false;
+    // document.getElementById('defenseur2-nom').value = '';
+    // document.getElementById('defenseur2-guerriers').value = '0';
+    // document.getElementById('potions-disponibles').value = '0';
+    // document.getElementById('materiaux-disponibles').value = '0';
+    // document.getElementById('attaquant-de').value = '';
+    // document.getElementById('defenseur-de').value = '';
+
+    // // Masquer les sections
+    // document.getElementById('step2').classList.remove('show');
+    // document.getElementById('results').classList.remove('show');
+
+    // // Remonter en haut
+    // document.getElementById('step1').scrollIntoView({ behavior: 'smooth' });
+
+    // // Réinitialiser les données
+    // gameData = {};
+
+        window.location.reload();
+}
+
+// Affichage/fermeture de la modale
+const helpBtn = document.getElementById('help-btn');
+const modal = document.getElementById('rules-modal');
+const closeModal = document.getElementById('close-modal');
+
+// Flèche si scroll possible dans la modale
+function updateScrollArrow() {
+    const scroll = document.getElementById('modal-scroll');
+    const arrow = document.getElementById('scroll-arrow');
+    if (!scroll || !arrow) return;
+    // Affiche la flèche si le contenu déborde
+    if (scroll.scrollHeight > scroll.clientHeight + 4) {
+        // Si on n'est pas tout en bas, affiche la flèche
+        if (scroll.scrollTop + scroll.clientHeight < scroll.scrollHeight - 4) {
+            arrow.style.display = '';
+        } else {
+            arrow.style.display = 'none';
+        }
+    } else {
+        arrow.style.display = 'none';
+    }
+}
+const modalScroll = document.getElementById('modal-scroll');
+if (modalScroll) {
+    modalScroll.addEventListener('scroll', updateScrollArrow);
+}
+helpBtn.addEventListener('click', () => {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    modal.focus();
+    setTimeout(updateScrollArrow, 100); // attendre le rendu
+});
+closeModal.addEventListener('click', () => {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+});
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});
+document.addEventListener('keydown', (e) => {
+    if (modal.style.display === 'flex' && (e.key === 'Escape' || e.key === 'Esc')) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});
+window.addEventListener('resize', updateScrollArrow);
+
+// Fonction pour mettre à jour le titre Défenseur(s)
+function updateDefenseurTitre() {
+    // On cible le titre dans la section défenseur uniquement
+    const defenseurSection = document.querySelector('.defenseur-section');
+    if (!defenseurSection) return;
+    const titre = defenseurSection.querySelector('.section-title');
+    const allieBox = document.getElementById('defenseur-allie-box');
+    if (titre && allieBox) {
+        if (allieBox.classList.contains('visible')) {
+            titre.textContent = "Défenseurs 🛡️";
+        } else {
+            titre.textContent = "Défenseur 🛡️";
+        }
+    }
+}
+
+// Fonction pour mettre à jour le titre Attaquant(s)
+function updateAttaquantTitre() {
+    // On cible le titre dans la section attaquant uniquement
+    const attaquantSection = document.querySelector('.attaquant-section');
+    if (!attaquantSection) return;
+    const titre = attaquantSection.querySelector('.section-title');
+    const allieBox = document.getElementById('attaquant-allie-box');
+    if (titre && allieBox) {
+        if (allieBox.classList.contains('visible')) {
+            titre.textContent = "Attaquants 🤺";
+        } else {
+            titre.textContent = "Attaquant(s) 🤺";
+        }
+    }
+}
+
+// Ajoute la gestion de l'obligation des champs allié
+function updateAllieRequired() {
+    const allieBox = document.getElementById('defenseur-allie-box');
+    const nomStar = document.getElementById('defenseur2-nom-star');
+    const guerriersStar = document.getElementById('defenseur2-guerriers-star');
+    const nomInput = document.getElementById('defenseur2-nom');
+    const guerriersInput = document.getElementById('defenseur2-guerriers');
+    const isVisible = allieBox.classList.contains('visible');
+
+    // Affiche ou masque l'étoile obligatoire
+    nomStar.style.display = isVisible ? '' : 'none';
+    guerriersStar.style.display = isVisible ? '' : 'none';
+
+    // Ajoute ou retire l'attribut required
+    if (isVisible) {
+        nomInput.setAttribute('required', 'required');
+        guerriersInput.setAttribute('required', 'required');
+    } else {
+        nomInput.removeAttribute('required');
+        guerriersInput.removeAttribute('required');
+    }
+}
+
+// Ajoute la gestion de l'obligation des champs attaquant allié
+function updateAttaquantAllieRequired() {
+    const allieBox = document.getElementById('attaquant-allie-box');
+    const nomStar = document.getElementById('attaquant2-nom-star');
+    const guerriersStar = document.getElementById('attaquant2-guerriers-star');
+    const nomInput = document.getElementById('attaquant2-nom');
+    const guerriersInput = document.getElementById('attaquant2-guerriers');
+    const isVisible = allieBox.classList.contains('visible');
+
+    // Affiche ou masque l'étoile obligatoire
+    nomStar.style.display = isVisible ? '' : 'none';
+    guerriersStar.style.display = isVisible ? '' : 'none';
+
+    // Ajoute ou retire l'attribut required
+    if (isVisible) {
+        nomInput.setAttribute('required', 'required');
+        guerriersInput.setAttribute('required', 'required');
+    } else {
+        nomInput.removeAttribute('required');
+        guerriersInput.removeAttribute('required');
+    }
+}
+
+// Mets à jour la validation pour rendre les champs allié obligatoires si visible
+function checkPreparatifsValidity() {
+    const attaquantNom = document.getElementById('attaquant-nom').value.trim();
+    const attaquantGuerriers = parseInt(document.getElementById('attaquant-guerriers').value) || 0;
+    const defenseur1Nom = document.getElementById('defenseur1-nom').value.trim();
+    const defenseur1Guerriers = parseInt(document.getElementById('defenseur1-guerriers').value) || 0;
+    const actionDesiree = document.getElementById('action-desiree').value;
+    let ressourcesOk = false;
+    if (actionDesiree === 'argent') {
+        ressourcesOk = (document.getElementById('argent-disponible').value !== '');
+    } else {
+        ressourcesOk = (document.getElementById('materiaux-disponibles').value !== '');
+    }
+
+    // Il faut au moins un guerrier attaquant OU une potion utilisée
+    const attaquantPotions = parseInt(document.getElementById('attaquant-potions').value) || 0;
+    const attaquantOk = attaquantNom && (attaquantGuerriers > 0 || attaquantPotions > 0);
+
+    const defenseurOk = defenseur1Nom && defenseur1Guerriers >= 0;
+
+    // Champs allié défenseur obligatoires si visible
+    const allieDefBox = document.getElementById('defenseur-allie-box');
+    const allieDefVisible = allieDefBox.classList.contains('visible');
+    const defenseur2Nom = document.getElementById('defenseur2-nom').value.trim();
+    const defenseur2Guerriers = document.getElementById('defenseur2-guerriers').value;
+    let allieDefOk = true;
+    if (allieDefVisible) {
+        allieDefOk = defenseur2Nom.length > 0 && defenseur2Guerriers !== '';
+    }
+
+    // Champs allié attaquant obligatoires si visible
+    const allieAttBox = document.getElementById('attaquant-allie-box');
+    const allieAttVisible = allieAttBox.classList.contains('visible');
+    const attaquant2Nom = document.getElementById('attaquant2-nom').value.trim();
+    const attaquant2Guerriers = document.getElementById('attaquant2-guerriers').value;
+    let allieAttOk = true;
+    if (allieAttVisible) {
+        allieAttOk = attaquant2Nom.length > 0 && attaquant2Guerriers !== '';
+    }
+
+    // Ressource obligatoire selon l'action désirée
+    const btn = document.getElementById('valider-preparatifs-btn');
+    if (attaquantOk && defenseurOk && actionDesiree && ressourcesOk && allieDefOk && allieAttOk) {
+        btn.disabled = false;
+    } else {
+        btn.disabled = true;
+    }
+}
+
+// Ajoute les écouteurs sur tous les champs obligatoires + allié
+[
+    'attaquant-nom', 'attaquant-guerriers', 'attaquant-potions',
+    'attaquant2-nom', 'attaquant2-guerriers', 'attaquant2-potions',
+    'defenseur1-nom', 'defenseur1-guerriers',
+    'action-desiree', 'materiaux-disponibles', 'argent-disponible',
+    'defenseur2-nom', 'defenseur2-guerriers'
+].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', checkPreparatifsValidity);
+    }
+});
+
+// Mets à jour l'obligation visuelle/mécanique à chaque ouverture/fermeture de l'allié
+window.addEventListener('DOMContentLoaded', function () {
+    const toggleAllieBtn = document.getElementById('toggle-allie-btn');
+    if (toggleAllieBtn) {
+        toggleAllieBtn.addEventListener('click', function () {
+            const box = document.getElementById('defenseur-allie-box');
+            const isVisible = box.classList.contains('visible');
+            if (!isVisible) {
+                box.style.maxHeight = box.scrollHeight + "px";
+                box.classList.add('visible');
+                this.textContent = '− Retirer le défenseur allié';
+            } else {
+                box.style.maxHeight = box.scrollHeight + "px";
+                void box.offsetHeight;
+                box.style.maxHeight = "0";
+                box.classList.remove('visible');
+                this.textContent = '+ Ajouter un défenseur allié (optionnel)';
+                document.getElementById('defenseur2-nom').value = '';
+                document.getElementById('defenseur2-guerriers').value = '';
+            }
+            updateDefenseurTitre();
+            updateAllieRequired();
+            checkPreparatifsValidity();
+        });
+    }
+
+    const toggleAttaquantAllieBtn = document.getElementById('toggle-attaquant-allie-btn');
+    if (toggleAttaquantAllieBtn) {
+        toggleAttaquantAllieBtn.addEventListener('click', function () {
+            const box = document.getElementById('attaquant-allie-box');
+            const isVisible = box.classList.contains('visible');
+            if (!isVisible) {
+                box.style.maxHeight = box.scrollHeight + "px";
+                box.classList.add('visible');
+                this.textContent = '− Retirer l\'attaquant allié';
+            } else {
+                box.style.maxHeight = box.scrollHeight + "px";
+                void box.offsetHeight;
+                box.style.maxHeight = "0";
+                box.classList.remove('visible');
+                this.textContent = '+ Ajouter un attaquant allié (optionnel)';
+                document.getElementById('attaquant2-nom').value = '';
+                document.getElementById('attaquant2-guerriers').value = '';
+                document.getElementById('attaquant2-potions').value = '0';
+            }
+            updateAttaquantTitre();
+            updateAttaquantAllieRequired();
+            checkPreparatifsValidity();
+        });
+    }
+    // Appel initial pour le bon affichage au chargement
+    updateDefenseurTitre();
+    updateAttaquantTitre();
+    updateAllieRequired();
+    updateAttaquantAllieRequired();
+    checkPreparatifsValidity();
+});
+
+// Mets aussi à jour à chaque transition (ex: animation CSS)
+document.getElementById('defenseur-allie-box').addEventListener('transitionend', function (e) {
+    if (this.classList.contains('visible')) {
+        this.style.maxHeight = 'none';
+    }
+    updateAllieRequired();
+    checkPreparatifsValidity();
+});
+
+document.getElementById('attaquant-allie-box').addEventListener('transitionend', function (e) {
+    if (this.classList.contains('visible')) {
+        this.style.maxHeight = 'none';
+    }
+    updateAttaquantAllieRequired();
+    checkPreparatifsValidity();
+});
+
+// --- Masquer étapes si modification en haut ou dans les dés ---
+
+// Tous les champs de l'étape 1
+const step1Inputs = [
+    'attaquant-nom', 'attaquant-guerriers', 'attaquant-potions',
+    'attaquant2-nom', 'attaquant2-guerriers', 'attaquant2-potions',
+    'defenseur1-nom', 'defenseur1-guerriers', 'defenseur1-potions',
+    'oppidum-actif', 'defenseur2-nom', 'defenseur2-guerriers',
+    'action-desiree', 'materiaux-disponibles'
+];
+step1Inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', () => {
+            document.getElementById('step2').classList.remove('show');
+            document.getElementById('results').classList.remove('show');
+        });
+        // Pour le checkbox oppidum
+        if (el.type === 'checkbox') {
+            el.addEventListener('change', () => {
+                document.getElementById('step2').classList.remove('show');
+                document.getElementById('results').classList.remove('show');
+            });
+        }
+    }
+});
+
+// Si un dé est modifié, masquer les résultats
+['attaquant-de', 'defenseur-de'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', () => {
+            document.getElementById('results').classList.remove('show');
+        });
+    }
+});
+
+// ===========================
+// MODALE BILAN MAITRE DE SALLE
+// ===========================
+
+function ouvrirBilanMaitre() {
+    const bilanModal = document.getElementById('bilan-maitre-modal');
+    const bilanTableau = document.getElementById('bilan-tableau');
+    
+    // Générer le tableau de bilan
+    bilanTableau.innerHTML = genererBilanTableau();
+    
+    // Afficher la modale
+    bilanModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    bilanModal.focus();
+}
+
+function genererBilanTableau() {
+    // Vérifier que les résultats du combat sont disponibles
+    if (!gameData.resultats) {
+        return '<div class="error">Veuillez d\'abord calculer un combat pour générer le bilan.</div>';
+    }
+
+    const {
+        attaquantNom,
+        attaquantPotions,
+        attaquant2Nom,
+        attaquant2Potions,
+        defenseur1Nom,
+        defenseur2Nom,
+        ressourcesDesirees,
+        resultats
+    } = gameData;
+
+    // Utiliser les résultats déjà calculés
+    const {
+        R,
+        ressourcesVolees,
+        pertesAttaquant,
+        pertesAttaquant2,
+        pertesDefenseur1,
+        pertesDefenseur2,
+        aAllieAttaquant,
+        aAllieDefenseur
+    } = resultats;
+
+    // Construire le tableau
+    let html = `
+        <div class="bilan-tableau">
+            <div class="bilan-header">
+                Bilan des ressources par village
+            </div>
+            <div class="bilan-row header">
+                <div>Village</div>
+                <div>Statut</div>
+                <div>Matériaux</div>
+                <div>Guerriers</div>
+                <div>Potions</div>
+                <div>Argent</div>
+            </div>
+    `;
+
+    // Village attaquant principal
+    const statutAttaquant = R > 0 ? 'Gagnant' : 'Perdant';
+    const classStatutAttaquant = R > 0 ? 'statut-gagnant' : 'statut-perdant';
+    
+    let potionsAttaquant = -attaquantPotions; // Consommées
+    let materiauxAttaquant = 0;
+    let argentAttaquant = 0;
+    
+    if (R > 0 && ressourcesDesirees === 'materiaux') {
+        materiauxAttaquant += ressourcesVolees;
+    } else if (R > 0 && ressourcesDesirees === 'argent') {
+        argentAttaquant += ressourcesVolees;
+    }
+
+    html += `
+        <div class="bilan-row">
+            <div class="bilan-village">${attaquantNom}</div>
+            <div class="bilan-statut ${classStatutAttaquant}">${statutAttaquant}</div>
+            <div class="bilan-materiaux ${materiauxAttaquant > 0 ? 'gain' : materiauxAttaquant < 0 ? 'perte' : 'neutre'}">
+            ${materiauxAttaquant > 0 ? '+' : ''}${materiauxAttaquant}
+            </div>
+            <div class="bilan-guerriers ${pertesAttaquant > 0 ? 'perte' : 'neutre'}">
+            ${pertesAttaquant > 0 ? '-' : ''}${pertesAttaquant}
+            </div>
+            <div class="bilan-potions ${potionsAttaquant > 0 ? 'gain' : potionsAttaquant < 0 ? 'perte' : 'neutre'}">
+                ${potionsAttaquant > 0 ? '+' : ''}${potionsAttaquant}
+            </div>
+            <div class="bilan-argent ${argentAttaquant > 0 ? 'gain' : argentAttaquant < 0 ? 'perte' : 'neutre'}">
+                ${argentAttaquant > 0 ? '+' : ''}${argentAttaquant}
+            </div>
+        </div>
+    `;
+
+    // Village attaquant allié s'il existe
+    if (aAllieAttaquant) {
+        html += `
+            <div class="bilan-row">
+                <div class="bilan-village">${attaquant2Nom}</div>
+                <div class="bilan-statut statut-soutien">Soutien Attaque</div>
+                <div class="bilan-materiaux neutre">0</div>
+                <div class="bilan-guerriers ${pertesAttaquant2 > 0 ? 'perte' : 'neutre'}">
+                ${pertesAttaquant2 > 0 ? '-' : ''}${pertesAttaquant2}
+                </div>
+                <div class="bilan-potions ${-(attaquant2Potions || 0) < 0 ? 'perte' : 'neutre'}">
+                    ${-(attaquant2Potions || 0) || 0}
+                </div>
+                <div class="bilan-argent neutre">0</div>
+            </div>
+        `;
+    }
+
+    // Village défenseur principal
+    const statutDefenseur1 = R <= 0 ? 'Gagnant' : 'Perdant';
+    const classStatutDefenseur1 = R <= 0 ? 'statut-gagnant' : 'statut-perdant';
+    
+    let potionsDefenseur1 = 0;
+    let materiauxDefenseur1 = 0;
+    let argentDefenseur1 = 0;
+    
+    if (R > 0 && ressourcesDesirees === 'materiaux') {
+        materiauxDefenseur1 = -ressourcesVolees;
+    } else if (R > 0 && ressourcesDesirees === 'argent') {
+        argentDefenseur1 = -ressourcesVolees;
+    }
+
+    html += `
+        <div class="bilan-row">
+            <div class="bilan-village">${defenseur1Nom}</div>
+            <div class="bilan-statut ${classStatutDefenseur1}">${statutDefenseur1}</div>
+            <div class="bilan-materiaux ${materiauxDefenseur1 > 0 ? 'gain' : materiauxDefenseur1 < 0 ? 'perte' : 'neutre'}">
+            ${materiauxDefenseur1 > 0 ? '+' : ''}${materiauxDefenseur1}
+            </div>
+            <div class="bilan-guerriers ${pertesDefenseur1 > 0 ? 'perte' : 'neutre'}">
+            ${pertesDefenseur1 > 0 ? '-' : ''}${pertesDefenseur1}
+            </div>
+            <div class="bilan-potions ${potionsDefenseur1 > 0 ? 'gain' : potionsDefenseur1 < 0 ? 'perte' : 'neutre'}">
+                ${potionsDefenseur1 > 0 ? '+' : ''}${potionsDefenseur1}
+            </div>
+            <div class="bilan-argent ${argentDefenseur1 > 0 ? 'gain' : argentDefenseur1 < 0 ? 'perte' : 'neutre'}">
+                ${argentDefenseur1 > 0 ? '+' : ''}${argentDefenseur1}
+            </div>
+        </div>
+    `;
+
+    // Village allié défenseur s'il existe
+    if (aAllieDefenseur) {
+        html += `
+            <div class="bilan-row">
+                <div class="bilan-village">${defenseur2Nom}</div>
+                <div class="bilan-statut statut-soutien">Soutien Défense</div>
+                <div class="bilan-materiaux neutre">0</div>
+                <div class="bilan-guerriers ${pertesDefenseur2 > 0 ? 'perte' : 'neutre'}">
+                ${pertesDefenseur2 > 0 ? '-' : ''}${pertesDefenseur2}
+                </div>
+                <div class="bilan-potions neutre">0</div>
+                <div class="bilan-argent neutre">0</div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    
+    return html;
+}
+
+// Gestion de la fermeture de la modale bilan
+const bilanModal = document.getElementById('bilan-maitre-modal');
+const closeBilanModal = document.getElementById('close-bilan-modal');
+
+if (closeBilanModal) {
+    closeBilanModal.addEventListener('click', () => {
+        bilanModal.style.display = 'none';
+        document.body.style.overflow = '';
+    });
+}
+
+if (bilanModal) {
+    bilanModal.addEventListener('click', (e) => {
+        if (e.target === bilanModal) {
+            bilanModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+document.addEventListener('keydown', (e) => {
+    if (bilanModal && bilanModal.style.display === 'flex' && (e.key === 'Escape' || e.key === 'Esc')) {
+        bilanModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});

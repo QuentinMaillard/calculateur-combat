@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Comba                                    <input type="number" id="defenseur2-guerriers" min="0" value="0" placeholder="0"> - Guerre des Gaules</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;70                        <li><strong>Seul le vainqueur peut piller !</strong> Si vous perdez, vous repartez les mains vides</li>
+                        <li><strong>Plus vous dominez, plus vous pillez :</strong> La quantité volée dépend de votre marge de victoire</li>
+                        <li><strong>Les potions sont plus difficiles à voler</strong> que les matériaux ou l'argent</li>
+                        <li><strong>Limitation des stocks :</strong> Vous ne pouvez pas voler plus que ce qui est disponible</li>play=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2252%22 font-size=%2250%22>⚔️</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<div id="fade-black"
+    style="display:none; position:fixed; inset:0; background:#000; z-index:2999; opacity:0; transition:opacity 0.5s;">
+</div>
+
+<body>
+    <a href="../index.html" class="home-button">
+        <span class="home-text">🏠 Accueil</span>
+        <span class="home-icon">🏠</span>
+    </a>
+
+    <div id="countdown-overlay"
+        style="display:none; position:fixed; inset:0; background:rgba(60,50,30,0.85); z-index:3000; align-items:center; justify-content:center; flex-direction:column; overflow:hidden;">
+
+        <video id="countdown-bg-video" src="Assets/baggare.mp4" autoplay muted loop playsinline
+            style="position:absolute; inset:0; width:100vw; height:100vh; object-fit:cover; z-index:0; opacity:0.25; pointer-events:none;">
+        </video>
+        <h1 style="color:#fffbe6; font-family:'IM Fell DW Pica',serif; z-index:1;">⚔️ Les dés sont jettés ⚔️ <br><br>
+            Les fiers guerriers rejoignent maintenant le
+            champ de bataille...
+        </h1>
+        <div id="countdown-number"
+            style="font-size:5em; color:#fffbe6; font-family:'IM Fell DW Pica',serif; text-shadow:2px 2px 8px #000; margin-bottom:20px; z-index:1;">
+            5
+        </div>
+    </div>
+    <canvas id="confetti-canvas"
+        style="display:none; position:fixed; pointer-events:none; inset:0; z-index:4000;"></canvas>
+
+    <body>
+        <div class="container">
+            <h1>⚔️ Calculateur de Combat - Guerre des Gaules ⚔️</h1>
+
+            <!-- Étape 1 : Saisie des informations -->
+            <div class="combat-card" id="step1">
+                <div class="combat-grid">
+                    <div class="combat-section attaquant-section">
+                        <h2 class="section-title attaquant-section-title">Attaquant(s) 🤺</h2>
+                        <div class="attaquant-box">
+                            <div class="form-group">
+                                <label for="attaquant-nom">🏘️ Nom de l'attaquant <span>*</span></label>
+                                <input type="text" id="attaquant-nom" placeholder="Ex: Les Irréductibles">
+                            </div>
+
+                            <div class="g1-m1-row">
+                                <div class="form-group">
+                                    <label for="attaquant-guerriers">🧝 Guerriers mobilisés<span>*</span></label>
+                                    <input type="number" id="attaquant-guerriers" min="0" value="" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="attaquant-potions">
+                                        🧪 Potions utilisées <span id="attaquant-potions-max-label">(Max: <span
+                                                id="attaquant-potions-max">0</span>)</span>
+                                    </label>
+                                    <input type="number" id="attaquant-potions" min="0" value="0" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div class="action-desirees-grid">
+                                <div class="form-group action-desirees-group">
+                                    <label for="action-desiree">🎯 Action désirée <span>*</span></label>
+                                    <select id="action-desiree">
+                                        <option value="materiaux">🧱 Piller des Matériaux !</option>
+                                        <option value="argent">🪙 Piller de l'Argent !</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bouton pour ajouter un allié attaquant -->
+                        <div style="text-align:center; margin-bottom: 12px;">
+                            <button type="button" id="toggle-attaquant-allie-btn" class="next-btn"
+                                style="padding: 8px 28px; font-size:1em; border-radius:6px; margin-top: 0;">
+                                + Ajouter un attaquant allié (optionnel)
+                            </button>
+                        </div>
+
+                        <!-- Attaquant allié (caché par défaut) -->
+                        <div class="attaquant-box" id="attaquant-allie-box">
+                            <div class="form-group">
+                                <label for="attaquant2-nom">🏘️ Nom de l'attaquant allié <span
+                                        id="attaquant2-nom-star">*</span></label>
+                                <input type="text" id="attaquant2-nom" placeholder="Ex: Les Hardis Guerriers">
+                            </div>
+                            <div class="g1-m1-row">
+                                <div class="form-group">
+                                    <label for="attaquant2-guerriers">🧝 Guerriers alliés<span
+                                            id="attaquant2-guerriers-star">*</span></label>
+                                    <input type="number" id="attaquant2-guerriers" min="0" value="" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="attaquant2-potions">
+                                        🧪 Potions utilisées <span id="attaquant2-potions-max-label">(Max: <span
+                                                id="attaquant2-potions-max">0</span>)</span>
+                                    </label>
+                                    <input type="number" id="attaquant2-potions" min="0" value="0" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="combat-section defenseur-section">
+                        <h2 class="section-title">Défenseur(s) 🛡️</h2>
+
+                        <!-- Défenseur principal -->
+                        <div class="defenseur-box">
+                            <div class="form-group">
+                                <label for="defenseur1-nom">🏘️ Nom du défenseur <span>*</span></label>
+                                <input type="text" id="defenseur1-nom" placeholder="Ex: Les Poissonniers">
+                            </div>
+                            <div class="g2-oppidum-row">
+                                <div class="form-group guerrier-half">
+                                    <label for="defenseur1-guerriers">🧝 Guerriers mobilisés<span>*</span></label>
+                                    <input type="number" id="defenseur1-guerriers" min="0" value="" placeholder="0">
+                                </div>
+                                <div class="form-group oppidum-group">
+                                    <label for="oppidum-actif">
+                                        <span>🏰 Oppidum</span>
+                                        <input type="checkbox" id="oppidum-actif">
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="village-grid" id="ressources-disponibles-group">
+
+                                <div class="form-group" id="materiaux-dispo-group">
+                                    <label for="materiaux-disponibles">🧱 Total Matériaux
+                                        possédées<span>*</span></label>
+                                                                <input type="number" id="materiaux-disponibles" min="0" value="0" placeholder="0">
+                                </div>
+                                <div class="form-group" id="argent-dispo-group" style="display:none;">
+                                    <label for="argent-disponible">🪙 Total Argent possédé<span>*</span></label>
+                                                                <input type="number" id="argent-disponible" min="0" value="0" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bouton pour ajouter un allié -->
+                        <div style="text-align:center; margin-bottom: 12px;">
+                            <button type="button" id="toggle-allie-btn" class="next-btn"
+                                style="padding: 8px 28px; font-size:1em; border-radius:6px; margin-top: 0;">
+                                + Ajouter un défenseur allié (optionnel)
+                            </button>
+                        </div>
+
+                        <!-- Défenseur allié (caché par défaut) -->
+                        <div class="defenseur-box" id="defenseur-allie-box">
+                            <div class="form-group">
+                                <label for="defenseur2-nom">🏘️ Nom du défenseur allié <span
+                                        id="defenseur2-nom-star">*</span></label>
+                                <input type="text" id="defenseur2-nom" placeholder="Ex: Les Forgerons">
+                            </div>
+                            <div class="village-grid">
+                                <div class="form-group guerrier-half">
+                                    <label for="defenseur2-guerriers">🧝 Guerriers alliés<span
+                                            id="defenseur2-guerriers-star">*</span></label>
+                                    <input type="number" id="defenseur2-guerriers" min="0" value="" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <div class="error-message" id="error-message"></div>
+                    <button class="next-btn" id="valider-preparatifs-btn" onclick="validerEtape1()" disabled>Valider les
+                        préparatifs...</button>
+                </div>
+            </div>
+
+            <!-- Étape 2 : Jets de dés -->
+            <div class="dice-section" id="step2">
+                <div class="dice-card">
+                    <h2 class="result-title">Récapitulatif du Combat</h2>
+                    <div
+                        style="text-align: center;background: #fffbe6; border-left: 5px solid #bfa76a; color: #6b5b2b; padding: 12px 18px; margin: 18px 0; border-radius: 6px; font-size: 1em;">
+                        Prenez soin de vérifier que ces données correspondent bien à votre stratégie, mais aussi à la
+                        réalité de vos ressources et vos effectifs. <br><br> Si vous n'êtes pas sûrs, faites appel au
+                        Maitre de Salle!
+                    </div>
+
+                    <div class="summary-section">
+                        <div class="summary-grid">
+                            <div class="summary-box">
+                                <h3>🤺 <span id="summary-attaquant-nom"></span></h3>
+                                <div class="summary-line"><strong>Guerriers engagés (G1) :</strong> <span
+                                        id="summary-attaquant-guerriers"></span></div>
+                                <div class="summary-line"><strong>Guerriers sous potion (M1) :</strong> <span
+                                        id="summary-attaquant-potions"></span></div>
+                                <div class="summary-line"><strong>Ressources désirées :</strong> <span
+                                        id="summary-ressources"></span></div>
+                                <div class="summary-line" id="summary-attaquant-allie-line" style="display: none;">
+                                    <strong>Allié <span id="summary-attaquant-allie-nom"></span> :</strong> <span
+                                        id="summary-attaquant-allie-guerriers"></span> guerriers, <span
+                                        id="summary-attaquant-allie-potions"></span> potions
+                                </div>
+                            </div>
+
+                            <div class="summary-box">
+                                <h3>🛡️ <span id="summary-defenseur-nom"></span></h3>
+                                <div class="summary-line"><strong>Guerriers (G2) :</strong> <span
+                                        id="summary-defenseur-guerriers"></span></div>
+                                <div class="summary-line"><strong>Oppidum présent :</strong> <span
+                                        id="summary-oppidum"></span></div>
+                                <div class="summary-line" id="summary-defenseur-ressources-line">
+                                    <strong>Ressources disponibles :</strong>
+                                    <span id="summary-defenseur-ressources"></span>
+                                </div>
+                                <div class="summary-line" id="summary-allie-line" style="display: none;">
+                                    <strong>Allié <span id="summary-allie-nom"></span> (G3) :</strong> <span
+                                        id="summary-allie-guerriers"></span> guerriers
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="text-align: center; margin-bottom: 20px; color: #333; font-size: 1.5em;">Et maintenant,
+                        lancez les dés du destin !
+                    </h3>
+                    <div style="text-align:center; color:#666; font-size:1.5em; margin-bottom:28px; font-style:italic;">
+                        Que Toutatis soit avec vous ! ⚡
+                    </div>
+
+
+                    <div class="dice-random-section" style="margin-bottom: 18px;">
+                        <div id="dice-roll-result"
+                            style="display:flex; flex-direction:row; align-items:center; justify-content:center; gap:32px; margin-top:18px; width:100%;">
+                            <div class="dice-box attaquant"
+                                style="display:flex; flex-direction:column; align-items:center;">
+                                <h3>🎲 Attaquant</h3>
+                                <span id="attaquant-de-result"
+                                    style="font-size:2em; color:#bfa76a; min-height:1.5em;">?</span>
+                                <button class="roll-dice-btn" id="roll-dice-attaquant"
+                                    style="margin-top:12px; font-size:1em; padding:8px 18px; border-radius:8px; background:#bfa76a; color:#fffbe6; border:none; cursor:pointer;">Lancer
+                                    le dé</button>
+                            </div>
+                            <div class="dice-separator">⚔️</div>
+                            <div class="dice-box defenseur"
+                                style="display:flex; flex-direction:column; align-items:center;">
+                                <h3>🎲 Défenseur</h3>
+                                <span id="defenseur-de-result"
+                                    style="font-size:2em; color:#bfa76a; min-height:1.5em;">?</span>
+                                <button class="roll-dice-btn" id="roll-dice-defenseur"
+                                    style="margin-top:12px; font-size:1em; padding:8px 18px; border-radius:8px; background:#bfa76a; color:#fffbe6; border:none; cursor:pointer;">Lancer
+                                    le dé</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <div class="error-message" id="error-message-dice"></div>
+                        <button class="calculate-btn" id="calculate-btn" onclick="calculerCombat()" disabled>Lancer la
+                            bataille!</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 3 : Résultats -->
+            <div class="results" id="results">
+                <div class="result-card">
+                    <h2 class="result-title">Résultats du Combat</h2>
+                    <div id="results-content"></div>
+                    <h3 class="result-title">Allez présenter le résultat au Maitre de Salle</h3>
+                    <div class="button-container">
+                        <button class="calculate-btn" onclick="ouvrirBilanMaitre()">📋 Bilan Maître de Salle</button>
+                        <button class="reset-btn" onclick="recommencer()">Nouveau Combat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton d'aide en bas à droite -->
+            <button id="help-btn" aria-label="Afficher les règles">❓</button>
+
+            <!-- Modale des règles -->
+            <div id="rules-modal" class="modal-overlay" tabindex="-1" aria-modal="true" style="display:none;">
+                <div class="modal-content" role="dialog" aria-labelledby="modal-title">
+                    <button class="modal-close" id="close-modal" aria-label="Fermer">✕</button>
+                    <h2 id="modal-title" class="section-title" style="margin-top:0;">🧮 Règles de Combat</h2>
+                    <div class="modal-scroll" id="modal-scroll">
+                        <h3 class="modal-subtitle">🏆 Victoire et Défaite</h3>
+                        <ul>
+                            <li><strong>Qui gagne ?</strong> Le camp avec la plus haute valeur de combat remporte la
+                                bataille</li>
+                            <li><strong>Valeur de combat :</strong> Nombre de guerriers + jet de dé + bonus divers</li>
+                            <li><strong>Les potions</strong> donnent un bonus d'attaque (+0.5 par potion)</li>
+                            <li><strong>L'oppidum</strong> donne un bonus de défense proportionnel aux effectifs</li>
+                        </ul>
+                        <h3 class="modal-subtitle">💰 Ressources Volées</h3>
+                        <p>📋 Règle de base : Seul le vainqueur pille</p>
+                        <br>
+                        <ul>
+                            <li>📊 Quantité : Dépend de la marge de victoire</li>
+                            <li>🚫 Limitation : Impossible de voler plus que les stocks</li>
+                            <li>🧪 Voler de la potion n'est pas possible</li>
+                        </ul>
+                        
+                        <h3 class="modal-subtitle">🧪 Potion Magique</h3>
+                        <ul>
+                            <li><strong>Réservée aux attaquants :</strong> Seuls les attaquants peuvent utiliser des
+                                potions magiques</li>
+                            <li><strong>Double effet :</strong> Chaque potion donne un bonus d'attaque (+0.5) ET protège
+                                un guerrier</li>
+                            <li><strong>Protection magique :</strong> Les potions sauvent vos guerriers des blessures
+                                mortelles</li>
+                            <li><strong>Pas de gaspillage :</strong> Vous ne pouvez pas utiliser plus de potions que de
+                                guerriers</li>
+                        </ul>
+
+                        <h3 class="modal-subtitle">🏰 Oppidum</h3>
+                        <ul>
+                            <li><strong>Réservé aux défenseurs :</strong> Seuls les défenseurs peuvent bénéficier de
+                                l'oppidum</li>
+                            <li><strong>Bonus défensif :</strong> L'oppidum offre un bonus de défense
+                                proportionnel aux effectifs (total guerrier défenseurs + nombre guerriers défenseurs/2)</li>
+                            <li><strong>Protection supplémentaire :</strong> Chaque guerrier perdu a 50% de chance d'être
+                                sauvé grâce à la fortification</li>
+                            <li><strong>Stratégie clé :</strong> L'oppidum peut renverser le cours d'une bataille
+                                difficile</li>
+                        </ul>
+
+                        <h3 class="modal-subtitle">Pertes humaines ☠️</h3>
+                        <p><strong>Les pertes dépendent de plusieurs facteurs réalistes :</strong></p>
+
+                        <h4 style="color:#bfa76a; margin:16px 0 8px 0;">📊 Intensité du Combat</h4>
+                        <ul>
+                            <li><strong>Taille totale des armées :</strong> Plus la bataille est importante, plus elle
+                                est sanglante</li>
+                            <li>Petite escarmouche (≤30) → Pertes modérées</li>
+                            <li>Grande bataille (>150) → Pertes lourdes même pour le vainqueur</li>
+                        </ul>
+
+                        <h4 style="color:#bfa76a; margin:16px 0 8px 0;">🎲 Férocité des Combattants</h4>
+                        <ul>
+                            <li><strong>Jets de dés élevés :</strong> Soldats motivés qui se battent avec acharnement
+                            </li>
+                            <li>Un camp avec un excellent dé peut infliger des pertes même en perdant</li>
+                            <li>Écart de dés important → Le camp favorisé fait plus de dégâts</li>
+                        </ul>
+
+                        <h4 style="color:#bfa76a; margin:16px 0 8px 0;">🛡️ Avantages Tactiques</h4>
+                        <ul>
+                            <li><strong>Attaquants :</strong> Subissent plus de pertes (assaut difficile)</li>
+                            <li><strong>Défenseurs :</strong> Avantage du terrain, pertes réduites</li>
+                            <li><strong>Oppidum :</strong> Bonus défensif + 50% de chance de sauver chaque guerrier
+                                perdu</li>
+                            <li><strong>Potions :</strong> Protection magique, sauvent des guerriers attaquants</li>
+                        </ul>
+                    </div>
+                    <div id="scroll-arrow" style="display:none;" aria-hidden="true">
+                        <span
+                            style="display:block; text-align:center; font-size:2em; color:#bfa76a; pointer-events:none; user-select:none;">
+                            ↓
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale Bilan Maître de Salle -->
+        <div id="bilan-maitre-modal" class="modal-overlay" tabindex="-1" aria-modal="true" style="display:none;">
+            <div class="modal-content bilan-modal-content" role="dialog" aria-labelledby="bilan-modal-title">
+                <button class="modal-close" id="close-bilan-modal" aria-label="Fermer">✕</button>
+                <h2 id="bilan-modal-title" class="section-title" style="margin-top:0;">📋 Bilan Maître de Salle</h2>
+                <div class="bilan-content">
+                    <div id="bilan-tableau"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer
+            style="width:100%; display:flex; justify-content:center; align-items:center; padding:32px 0 12px 0; background:transparent;">
+            <a href="https://www.linkedin.com/company/104192580/" target="_blank">
+                <img src="Assets/fondations.png" alt="Fondations"
+                    style="width:300px; max-width:90vw; height:auto; display:block;">
+            </a>
+        </footer>
+
+        <script src="script.js"></script>
+    </body>
+
+</html>
