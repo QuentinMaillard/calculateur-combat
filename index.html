@@ -59,6 +59,25 @@
             font-style: italic;
         }
 
+        /* Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'IM Fell DW Pica', 'Roboto Slab', serif;
+            font-size: 2rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 1px;
+            padding: 1rem 0;
+            background: rgba(114, 77, 25, 0.8);
+            border-radius: 8px;
+            border: 2px solid rgba(191, 167, 106, 0.6);
+        }
+
         /* Grille des options */
         .options-grid {
             display: grid;
@@ -106,6 +125,10 @@
 
         .option-card.tableur .option-header {
             background: linear-gradient(135deg, #26a69a 0%, #00695c 100%);
+        }
+
+        .option-card.planning .option-header {
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
         }
 
         .option-icon {
@@ -171,6 +194,10 @@
 
         .option-card.tableur .option-features li::before {
             content: "📊";
+        }
+
+        .option-card.planning .option-features li::before {
+            content: "📅";
         }
 
         .option-button {
@@ -242,6 +269,16 @@
             .main-header p {
                 font-size: 1rem;
             }
+
+            .section {
+                margin-bottom: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+                padding: 0.8rem 0;
+            }
             
             /* Grille mobile : 1 colonne */
             .options-grid {
@@ -295,6 +332,16 @@
             .main-header p {
                 font-size: 0.95rem;
             }
+
+            .section {
+                margin-bottom: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+                padding: 0.6rem 0;
+            }
             
             .option-header {
                 padding: 1.2rem;
@@ -315,6 +362,10 @@
 
         /* Tablette (768px à 1024px) */
         @media (min-width: 768px) and (max-width: 1024px) {
+            .section-title {
+                font-size: 1.8rem;
+            }
+
             .options-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 1.5rem;
@@ -325,21 +376,37 @@
             }
         }
 
-        /* Desktop (1025px et plus) - 4 colonnes */
+        /* Desktop (1025px et plus) - adaptatif selon le nombre d'éléments */
         @media (min-width: 1025px) {
-            .options-grid {
-                grid-template-columns: repeat(4, 1fr);
+            .section:nth-child(1) .options-grid {
+                /* Section 1: 2 éléments - 2 colonnes */
+                grid-template-columns: repeat(2, 1fr);
                 gap: 1.5rem;
-                max-width: 1400px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .section:nth-child(2) .options-grid {
+                /* Section 2: 3 éléments - 3 colonnes */
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .section:nth-child(3) .options-grid {
+                /* Section 3: 1 élément - centré */
+                grid-template-columns: 1fr;
+                max-width: 400px;
                 margin: 0 auto;
             }
         }
 
         /* Large Desktop (1400px et plus) */
         @media (min-width: 1400px) {
-            .options-grid {
+            .section:nth-child(2) .options-grid {
                 gap: 2rem;
-                max-width: 1600px;
+                max-width: 1400px;
             }
             
             .option-content {
@@ -412,77 +479,109 @@
             <p>Hub des liens</p>
         </header>
 
-        <!-- Options principales -->
-        <main class="options-grid">
-            <!-- Espace Notion -->
-            <a href="#" onclick="window.open('https://quentin-maillard.notion.site/La-Guerre-des-Gaules-Semaine-d-int-gration-2833430234e180f59722db0c950c9993?pvs=74', '_blank'); return false;" class="option-card notion">
-                <div class="option-header">
-                    <span class="option-icon">📖</span>
-                    <h2 class="option-title">Règles du jeu</h2>
-                    <p class="option-subtitle">Règles, challenges et planning</p>
-                </div>
-                <div class="option-content">
-                    <div class="option-button">
-                        Ouvrir le centre
-                    </div>
-                </div>
-            </a>
-            
-            <!-- Tableur de village -->
-            <a href="#" onclick="window.open('https://docs.google.com/spreadsheets/d/1zxMwJO9uAGG4ErYn0ISD-u7VX7xQjKQrlQUM_TK9jHs/edit?usp=sharing', '_blank'); return false;" class="option-card tableur">
-                <div class="option-header">
-                    <span class="option-icon">📊</span>
-                    <h2 class="option-title">Tableur de gestion</h2>
-                    <p class="option-subtitle">Gérez vos décisions et ressources</p>
-                </div>
-                <div class="option-content">
-                    <div class="option-button">
-                        Ouvrir le template
-                    </div>
-                </div>
-            </a>
+        <!-- Contenu principal organisé par sections -->
+        <main>
+            <!-- Section 1: Règles et ressources -->
+            <section class="section">
+                <h2 class="section-title">1. Règles et Challenges</h2>
+                <div class="options-grid">
+                    <!-- Espace Notion -->
+                    <a href="#" onclick="window.open('https://quentin-maillard.notion.site/Livret-de-Jeu-r-gles-et-m-caniques-2853430234e180979c53d76408a4c3df?source=copy_link', '_blank'); return false;" class="option-card notion">
+                        <div class="option-header">
+                            <span class="option-icon">📖</span>
+                            <h3 class="option-title">Livret de jeu</h3>
+                            <p class="option-subtitle">Règles et Mécaniques</p>
+                        </div>
+                        <div class="option-content">
+                            <div class="option-button">
+                                Ouvrir le livret
+                            </div>
+                        </div>
+                    </a>
 
-            <!-- Calculateur de combat -->
-            <a href="combat/index.html" class="option-card calculator">
-                <div class="option-header">
-                    <span class="option-icon">⚔️</span>
-                    <h2 class="option-title">Combat</h2>
-                    <p class="option-subtitle">Calculez l'issu de votre combat</p>
+                    <!-- Planning -->
+                    <a href="#" onclick="window.open('https://quentin-maillard.notion.site/Challenges-2853430234e180f8abf5f90b43ec71b5?source=copy_link', '_blank'); return false;" class="option-card planning">
+                        <div class="option-header">
+                            <span class="option-icon">💪</span>
+                            <h3 class="option-title">Challenges</h3>
+                            <p class="option-subtitle">Fonctionnement, Consignes et Planning</p>
+                        </div>
+                        <div class="option-content">
+                            <div class="option-button">
+                                Voir les challenges
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="option-content">
-                    <div class="option-button">
-                        Aller au Calculateur
-                    </div>
-                </div>
-            </a>
+            </section>
 
-            <!-- Générateur de bilan commercial -->
-            <a href="commerce/index.html" class="option-card commerce">
-                <div class="option-header">
-                    <span class="option-icon">🏪</span>
-                    <h2 class="option-title">Bilan Commercial</h2>
-                    <p class="option-subtitle">Gérez vos transactions entre villages</p>
-                </div>
-                <div class="option-content">
-                    <div class="option-button">
-                        Générer un Bilan
-                    </div>
-                </div>
-            </a>
+            <!-- Section 2: Outils de jeu -->
+            <section class="section">
+                <h2 class="section-title">2. Outils de jeu</h2>
+                <div class="options-grid">
+                    <!-- Tableur de village -->
+                    <a href="#" onclick="window.open('https://docs.google.com/spreadsheets/d/1zxMwJO9uAGG4ErYn0ISD-u7VX7xQjKQrlQUM_TK9jHs/edit?usp=sharing', '_blank'); return false;" class="option-card tableur">
+                        <div class="option-header">
+                            <span class="option-icon">📊</span>
+                            <h3 class="option-title">Tableur de gestion</h3>
+                            <p class="option-subtitle">Gérez vos décisions et ressources</p>
+                        </div>
+                        <div class="option-content">
+                            <div class="option-button">
+                                Ouvrir le template
+                            </div>
+                        </div>
+                    </a>
 
-            <!-- Liste des équipes -->
-            <a href="équipes/index.html" class="option-card teams">
-                <div class="option-header">
-                    <span class="option-icon">🏘️</span>
-                    <h2 class="option-title">Équipes</h2>
-                    <p class="option-subtitle">Trouvez votre peuple et votre nouveau village</p>
+                    <!-- Calculateur de combat -->
+                    <a href="combat/index.html" class="option-card calculator">
+                        <div class="option-header">
+                            <span class="option-icon">⚔️</span>
+                            <h3 class="option-title">Combat</h3>
+                            <p class="option-subtitle">Calculez l'issu de votre combat</p>
+                        </div>
+                        <div class="option-content">
+                            <div class="option-button">
+                                Faire la baggarre
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Générateur de bilan commercial -->
+                    <a href="commerce/index.html" class="option-card commerce">
+                        <div class="option-header">
+                            <span class="option-icon">🏪</span>
+                            <h3 class="option-title">Bilan Commercial</h3>
+                            <p class="option-subtitle">Gérez vos transactions entre villages</p>
+                        </div>
+                        <div class="option-content">
+                            <div class="option-button">
+                                Générer un Bilan
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="option-content">
-                    <div class="option-button">
-                        Trouver son village
-                    </div>
+            </section>
+
+            <!-- Section 3: Organisation -->
+            <section class="section">
+                <h2 class="section-title">3. Organisation</h2>
+                <div class="options-grid">
+                    <!-- Liste des équipes -->
+                    <a href="équipes/index.html" class="option-card teams">
+                        <div class="option-header">
+                            <span class="option-icon">🏘️</span>
+                            <h3 class="option-title">Équipes</h3>
+                            <p class="option-subtitle">Trouvez votre peuple et votre nouveau village</p>
+                        </div>
+                        <div class="option-content">
+                            <div class="option-button">
+                                Trouver son village
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </a>
+            </section>
         </main>
 
         <!-- Footer -->
