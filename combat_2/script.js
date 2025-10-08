@@ -1,11 +1,9 @@
 // ===========================
 // CONFIGURATION - NOMBRE D'ALLIÉS AUTORISÉS
 // ===========================
-// 0 = Pas d'alliés (combat 1v1 uniquement)
-// 1 = Un seul allié classique (combat 2v2 max)  
-// 2+ = Alliés multiples (combat 3v3, 4v4, etc.)
-const MAX_ALLIES_ATTAQUANT = 0; // Nombre maximum d'alliés attaquants
-const MAX_ALLIES_DEFENSEUR = 1; // Nombre maximum d'alliés défenseurs
+// 0 = Pas d'alliés
+const MAX_ALLIES_ATTAQUANT = 2; 
+const MAX_ALLIES_DEFENSEUR = 2;
 
 // Variables pour gérer plusieurs alliés
 let attaquantAlliesCount = 0;
