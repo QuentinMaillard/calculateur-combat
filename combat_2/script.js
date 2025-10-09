@@ -5,6 +5,13 @@
 const MAX_ALLIES_ATTAQUANT = 2; 
 const MAX_ALLIES_DEFENSEUR = 2;
 
+// ===========================
+// CONFIGURATION - NIVEAU DE DIFFICULTÉ
+// ===========================
+// "DEMARRAGE" = Pertes réduites de moitié
+// "AVANCE" = Pertes normales
+const NIVEAU_DIFFICULTE = "AVANCE";
+
 // Variables pour gérer plusieurs alliés
 let attaquantAlliesCount = 0;
 let defenseurAlliesCount = 0;
@@ -27,6 +34,16 @@ function isMultipleMode(type) {
 
 function getMaxAllies(type) {
     return type === 'attaquant' ? MAX_ALLIES_ATTAQUANT : MAX_ALLIES_DEFENSEUR;
+}
+
+// Fonction utilitaire pour ajuster les pertes selon le niveau de difficulté
+function ajusterPertes(pertes) {
+    if (NIVEAU_DIFFICULTE === "DEMARRAGE") {
+        // En mode démarrage, diviser les pertes par 2 avec arrondi supérieur
+        return Math.ceil(pertes / 2);
+    }
+    // En mode avancé, pertes normales
+    return pertes;
 }
 
 let gameData = {};
@@ -1166,8 +1183,9 @@ function calculerCombat() {
         // 5. Application du facteur d'intensité
         const pourcentageFinal = Math.max(5, Math.min(60, pourcentageBase * facteurIntensite));
         
+        const pertesCalculees = Math.ceil(guerriers * (pourcentageFinal / 100));
         return {
-            pertes: Math.ceil(guerriers * (pourcentageFinal / 100)),
+            pertes: ajusterPertes(pertesCalculees),
             pourcentage: Math.round(pourcentageFinal * 10) / 10
         };
     }
@@ -1629,13 +1647,8 @@ function checkPreparatifsValidity() {
                 for (let i = 0; i < defenseurAlliesCount; i++) {
                     const nomField = document.getElementById(`defenseur${i + 3}-nom`);
                     const guerriersField = document.getElementById(`defenseur${i + 3}-guerriers`);
-                    console.log(`Checking defenseur${i + 3}:`, {
-                        nomField: nomField ? nomField.value : 'not found',
-                        guerriersField: guerriersField ? guerriersField.value : 'not found'
-                    });
                     if (nomField && guerriersField) {
                         if (!nomField.value.trim() || guerriersField.value === '') {
-                            console.log(`Validation failed for defenseur${i + 3}`);
                             allieDefOk = false;
                             break;
                         }
@@ -1673,13 +1686,8 @@ function checkPreparatifsValidity() {
                 for (let i = 0; i < attaquantAlliesCount; i++) {
                     const nomField = document.getElementById(`attaquant${i + 3}-nom`);
                     const guerriersField = document.getElementById(`attaquant${i + 3}-guerriers`);
-                    console.log(`Checking attaquant${i + 3}:`, {
-                        nomField: nomField ? nomField.value : 'not found',
-                        guerriersField: guerriersField ? guerriersField.value : 'not found'
-                    });
                     if (nomField && guerriersField) {
                         if (!nomField.value.trim() || guerriersField.value === '') {
-                            console.log(`Validation failed for attaquant${i + 3}`);
                             allieAttOk = false;
                             break;
                         }
@@ -1697,18 +1705,6 @@ function checkPreparatifsValidity() {
             }
         }
     }
-
-    // Debug: afficher l'état de validation dans la console
-    console.log('Validation state:', {
-        attaquantOk,
-        defenseurOk,
-        actionDesiree,
-        ressourcesOk,
-        allieDefOk,
-        allieAttOk,
-        defenseurAlliesCount,
-        attaquantAlliesCount
-    });
 
     // Ressource obligatoire selon l'action désirée
     const btn = document.getElementById('valider-preparatifs-btn');
