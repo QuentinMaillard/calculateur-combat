@@ -77,10 +77,25 @@ h2,
 }
 
 .attaquant-box {
-    background: rgba(60, 50, 30, 0.13);
-    border-radius: 10px;
-    padding: 18px 18px 8px 18px;
-    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease-out;
+    backdrop-filter: blur(5px);
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, 
+        rgba(220, 53, 69, 0.1) 0%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(220, 53, 69, 0.05) 100%);
+}
+
+.attaquant-box:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
 }
 
 .defenseur-section {
@@ -89,10 +104,51 @@ h2,
 }
 
 .defenseur-box {
-    background: rgba(60, 50, 30, 0.13);
-    border-radius: 10px;
-    padding: 18px 18px 8px 18px;
-    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease-out;
+    backdrop-filter: blur(5px);
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, 
+        rgba(40, 167, 69, 0.1) 0%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(40, 167, 69, 0.05) 100%);
+}
+
+.defenseur-box:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Styles unifiés pour tous les labels et inputs */
+.attaquant-box label,
+.defenseur-box label {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.attaquant-box input,
+.defenseur-box input,
+.attaquant-box select,
+.defenseur-box select {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.attaquant-box input:focus,
+.defenseur-box input:focus,
+.attaquant-box select:focus,
+.defenseur-box select:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 #defenseur-allie-box {
@@ -109,6 +165,125 @@ h2,
     max-height: 500px;
     opacity: 1;
     margin-bottom: 18px;
+}
+
+#attaquant-allie-box {
+    transition: max-height 0.5s cubic-bezier(.4, 0, .2, 1), opacity 0.4s;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    will-change: max-height, opacity;
+    display: block;
+    margin-bottom: 0;
+}
+
+#attaquant-allie-box.visible {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 18px;
+}
+
+/* ===========================
+   ALLIÉS MULTIPLES DYNAMIQUES
+   =========================== */
+.attaquant-allie-box,
+.defenseur-allie-box {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease-out;
+    backdrop-filter: blur(5px);
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.attaquant-allie-box.visible,
+.defenseur-allie-box.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.attaquant-allie-box:hover,
+.defenseur-allie-box:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Effet de gradient subtil pour différencier attaquants et défenseurs */
+.attaquant-allie-box {
+    background: linear-gradient(135deg, 
+        rgba(220, 53, 69, 0.1) 0%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(220, 53, 69, 0.05) 100%);
+}
+
+.defenseur-allie-box {
+    background: linear-gradient(135deg, 
+        rgba(40, 167, 69, 0.1) 0%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(40, 167, 69, 0.05) 100%);
+}
+
+/* Style pour le bouton de suppression */
+.remove-allie-btn {
+    transition: all 0.2s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(215, 58, 73, 0.3);
+}
+
+.remove-allie-btn:hover {
+    background: #c82333 !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(215, 58, 73, 0.4);
+}
+
+.remove-allie-btn:active {
+    transform: scale(0.98);
+}
+
+/* Animation d'entrée pour les nouveaux alliés */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.attaquant-allie-box.nouveau,
+.defenseur-allie-box.nouveau {
+    animation: slideInUp 0.4s ease-out;
+}
+
+/* Style pour les labels des alliés */
+.attaquant-allie-box label,
+.defenseur-allie-box label {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Style pour les inputs dans les encarts d'alliés */
+.attaquant-allie-box input,
+.defenseur-allie-box input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.attaquant-allie-box input:focus,
+.defenseur-allie-box input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 /* ===========================
@@ -168,6 +343,11 @@ input:disabled,
     width: 100%;
 }
 
+/* Pour limiter la largeur du champ guerriers dans village-grid */
+.village-grid .form-group.guerrier-half {
+    width: 50%;
+}
+
 /* ===========================
    LIGNES SPÉCIALES DE FORMULAIRES
    =========================== */
@@ -195,8 +375,26 @@ input:disabled,
     margin-bottom: 0;
 }
 
+.g2-oppidum-row .form-group.guerrier-half {
+    flex: 0 0 48%;
+}
+
 /* Oppidum group - maintenant utilisé pour la checkbox */
 .oppidum-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Trahison group - même style que l'oppidum */
+.trahison-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+/* Peuple non corrompu group - même style que l'oppidum */
+.peuple-corrompu-group {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -205,7 +403,9 @@ input:disabled,
 /* ===========================
    CHECKBOX OPPIDUM SIMPLE
    =========================== */
-.oppidum-group label {
+.oppidum-group label,
+.trahison-group label,
+.peuple-corrompu-group label {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -214,7 +414,9 @@ input:disabled,
     cursor: pointer;
 }
 
-.oppidum-group input[type="checkbox"] {
+.oppidum-group input[type="checkbox"],
+.trahison-group input[type="checkbox"],
+.peuple-corrompu-group input[type="checkbox"] {
     width: 28px;
     height: 28px;
     margin: 0;
@@ -393,6 +595,7 @@ input:disabled,
     font-size: 2em;
     text-align: center;
     margin-bottom: 30px;
+    margin-top: 40px;
     color: #333;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -453,6 +656,101 @@ input:disabled,
     font-weight: 700;
     font-size: 1.1em;
     color: #333;
+}
+
+/* ===========================
+   NOUVEAU DESIGN BATTLE SUMMARY
+   =========================== */
+.battle-summary {
+    margin-bottom: 30px;
+}
+
+.summary-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.summary-box {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #8b6f47;
+}
+
+.attaquant-summary {
+    border-left-color: #d73a49;
+}
+
+.defenseur-summary {
+    border-left-color: #28a745;
+}
+
+.summary-box h3 {
+    color: #8b6f47;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.attaquant-summary h3 {
+    color: #d73a49;
+}
+
+.defenseur-summary h3 {
+    color: #28a745;
+}
+
+.summary-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.95em;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: #333;
+    background: rgba(139, 111, 71, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.combat-details {
+    animation: slideDown 0.3s ease-out;
+}
+
+.detail-line {
+    margin: 4px 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.battle-context {
+    background: linear-gradient(45deg, rgba(191, 167, 106, 0.1), rgba(139, 111, 71, 0.1));
+    border: 1px solid rgba(191, 167, 106, 0.3);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .results-grid {
@@ -529,6 +827,178 @@ footer a:focus img {
 }
 
 /* Version mobile : bouton rond en bas à gauche */
+/* ===========================
+   PRÉPARATIFS IMMERSIFS
+   =========================== */
+.preparatifs-narrative {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.preparatifs-intro {
+    text-align: center;
+}
+
+.narrative-text {
+    font-size: 1.1em;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+}
+
+/* ===========================
+   DÉS DU DESTIN
+   =========================== */
+.dice-destiny-section {
+    background: rgba(82, 57, 57, 0.8);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.dice-destiny-section h3 {
+    text-align: center;
+    color: #ffd700;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dice-explanation {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+.dice-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+.dice-box {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dice-box:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.attaquant-dice {
+    border-left: 4px solid #e74c3c;
+}
+
+.defenseur-dice {
+    border-left: 4px solid #27ae60;
+}
+
+.dice-box h4 {
+    color: #2c3e50;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    text-shadow: none;
+    font-weight: 600;
+}
+
+.dice-result-display {
+    margin: 20px 0;
+}
+
+.dice-number {
+    font-size: 3em;
+    font-weight: bold;
+    color: #e74c3c;
+    text-shadow: none;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.roll-dice-btn {
+    background: linear-gradient(135deg, #bfa76a, #8b7355);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.roll-dice-btn:hover {
+    background: linear-gradient(135deg, #d4bb7a, #9d8066);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.roll-dice-btn:active {
+    transform: translateY(0);
+}
+
+.dice-separator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.vs-text {
+    font-size: 1.2em;
+    color: #ffd700;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    transform: rotate(-15deg);
+}
+
+.dice-flavor-text {
+    margin-top: 15px;
+    font-style: italic;
+    color: #7f8c8d;
+    font-size: 0.9em;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Animation pour les résultats de dés */
+@keyframes diceRoll {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.2) rotate(90deg); }
+    50% { transform: scale(0.8) rotate(180deg); }
+    75% { transform: scale(1.1) rotate(270deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.dice-rolling {
+    animation: diceRoll 0.6s ease-in-out;
+}
+
+/* ===========================
+   MEDIA QUERIES
+   =========================== */
 @media (max-width: 768px) {
     .home-button {
         bottom: 20px;
@@ -911,6 +1381,22 @@ footer a:focus img {
     .dice-input-section {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+    
+    /* Responsivité pour les préparatifs */
+    .preparatifs-narrative,
+    .dice-destiny-section {
+        padding: 20px;
+    }
+    
+    .dice-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .vs-text {
+        transform: rotate(0deg);
+        margin: 10px 0;
     }
     
     /* Forcer la disposition en colonne pour les dés sur mobile */
